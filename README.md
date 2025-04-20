@@ -5,15 +5,18 @@ A Python web application for Vietnam stock portfolio analysis using Flask, vnsto
 ## Features
 - Fetches historical price data for user-selected Vietnam stock tickers using vnstock
 - Simulates portfolio performance and computes key metrics (returns, Sharpe, drawdown, etc.)
-- Generates interactive charts and quantstats tear sheet
+- Generates interactive charts and downloadable QuantStats HTML tear sheet
 - Responsive Bootstrap UI
+- **/analyze** route generates a QuantStats HTML report and redirects users to `/static/reports/quantstats-results.html` for a full tear sheet
+- "Back to Home" navigation is recommended for user-friendly return to the main page
+- Integrated tests verify routing, HTML file creation, and Matplotlib backend
 
 ## Project Structure
-- app.py: Flask backend (to be implemented)
-- data_loader.py: Data loader for historical prices
-- templates/: HTML templates (to be implemented)
-- static/: CSS and JS (to be implemented)
-- tests/: Unit and integration tests (to be implemented)
+- app.py: Flask backend (**implemented**)
+- data_loader.py: Data loader for historical prices (**implemented**)
+- templates/: HTML templates (**implemented**)
+- static/: CSS and JS (**implemented**)
+- tests/: Unit and integration tests (**implemented**)
 
 ## Setup Instructions
 
@@ -37,11 +40,15 @@ pip install uv
 uv pip install --all --upgrade --refresh
 ```
 
-### 3. Run the app (after implementing app.py)
+### 3. Run the app
 
 ```cmd
 python app.py
 ```
+
+The app will be available at http://127.0.0.1:5000
+
+After analyzing a portfolio, you will be redirected to a full QuantStats HTML report (tear sheet) at `/static/reports/quantstats-results.html`.
 
 ## Data Loader Usage
 
@@ -55,10 +62,29 @@ close_prices = get_close_prices(data, symbols)
 ```
 
 ## Testing
-- Unit and integration tests will be placed in `tests/`
+- Unit and integration tests are located in `tests/`
+- Tests verify:
+  - Routing and redirection to the QuantStats HTML report
+  - HTML report file creation
+  - Matplotlib backend is set to 'Agg' (for server-side rendering)
+
+To run all tests:
+
+```cmd
+pytest tests/test_app.py
+```
 
 ## Python Version
 - Requires Python >= 3.9
+
+## Troubleshooting & Notes
+- **Matplotlib GUI errors:** The backend is set to `'Agg'` for server-side image generation. If you see errors about "main thread is not in main loop", ensure this setting is present at the top of `app.py`:
+  ```python
+  import matplotlib
+  matplotlib.use('Agg')
+  ```
+- **Navigation:** For best UX, add a "Back to Home" button/link in the QuantStats HTML report pointing to `/`.
+- **Static report cleanup:** The generated HTML report (`static/reports/quantstats-results.html`) may be overwritten on each new analysis.
 
 ## License
 MIT
