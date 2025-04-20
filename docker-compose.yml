@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  quantstatswebapp:
+    build: .
+    container_name: quantstatswebapp
+    ports:
+      - "5000:5000"
+    environment:
+      - SECRET_KEY=dev
+    volumes:
+      - .:/app
+    restart: unless-stopped

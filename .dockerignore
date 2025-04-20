@@ -1,0 +1,26 @@
+# .dockerignore for QuantstatsWebApp
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+*.csv
+*.xlsx
+*.xls
+*.zip
+*.tar
+*.tar.gz
+*.egg-info/
+venv/
+.venv/
+dist/
+build/
+.env
+.env.*
+.DS_Store
+.git
+.gitignore
+static/reports/*.html
+static/reports/*.png
