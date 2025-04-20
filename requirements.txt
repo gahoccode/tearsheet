@@ -8,3 +8,4 @@ bootstrap-flask==2.3.3
 tenacity==8.2.3
 pytest==8.1.1
 ipython==8.24.0
+gunicorn
