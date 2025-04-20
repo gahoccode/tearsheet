@@ -5,9 +5,16 @@ Integration tests for Flask app routes and POST behavior
 
 import unittest
 from app import app
+import matplotlib
+
 from flask import url_for
 
 class FlaskAppIntegrationTest(unittest.TestCase):
+    def test_matplotlib_backend_is_agg(self):
+        """Test that matplotlib backend is set to 'Agg' for server-side rendering."""
+        import matplotlib
+        self.assertEqual(matplotlib.get_backend().lower(), 'agg')
+
     def setUp(self):
         self.app = app.test_client()
         self.app.testing = True

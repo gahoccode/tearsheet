@@ -11,6 +11,9 @@ import os
 import io
 import base64
 
+import matplotlib
+matplotlib.use('Agg')  # Use non-GUI backend for server-side image generation
+
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev')  # For flash messages
 
