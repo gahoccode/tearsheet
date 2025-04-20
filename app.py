@@ -8,6 +8,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from data_loader import fetch_historical_data, get_close_prices, DataLoaderError
 import pandas as pd
 import os
+import io
+import base64
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev')  # For flash messages
@@ -79,38 +81,38 @@ def analyze():
         os.makedirs(static_dir, exist_ok=True)
         # Unique prefix for this analysis
         unique_id = uuid.uuid4().hex[:8]
-        # File paths
-        summary_img = os.path.join(static_dir, f'qs_summary_{unique_id}.png')
-        monthly_img = os.path.join(static_dir, f'qs_monthly_{unique_id}.png')
-        drawdown_img = os.path.join(static_dir, f'qs_drawdown_{unique_id}.png')
-        # Generate and save plots
-        plt.close('all')
-        # Summary stats bar chart
-        ax = qs.plots.snapshot(portfolio_returns, title='Portfolio Snapshot', show=False)
-        if ax:
-            fig = ax.get_figure()
-            fig.savefig(summary_img, bbox_inches='tight')
-            plt.close(fig)
-        # Monthly returns heatmap
-        ax = qs.plots.monthly_heatmap(portfolio_returns, show=False)
-        if ax:
-            fig = ax.get_figure()
-            fig.savefig(monthly_img, bbox_inches='tight')
-            plt.close(fig)
-        # Drawdown
-        ax = qs.plots.drawdown(portfolio_returns, show=False)
-        if ax:
-            fig = ax.get_figure()
-            fig.savefig(drawdown_img, bbox_inches='tight')
-            plt.close(fig)
-        # Pass image filenames to template (relative to static/)
-        summary_img_url = f'/static/qs_summary_{unique_id}.png'
-        monthly_img_url = f'/static/qs_monthly_{unique_id}.png'
-        drawdown_img_url = f'/static/qs_drawdown_{unique_id}.png'
+
+        # Generate QuantStats summary snapshot
+        fig = qs.plots.snapshot(portfolio_returns, show=False)
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png', bbox_inches='tight')
+        buf.seek(0)
+        summary_img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        plt.close(fig)
+
+        # Generate QuantStats monthly returns heatmap
+        fig = qs.plots.monthly_heatmap(portfolio_returns, show=False)
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png', bbox_inches='tight')
+        buf.seek(0)
+        monthly_img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        plt.close(fig)
+
+        # Generate QuantStats drawdown plot
+        fig = qs.plots.drawdown(portfolio_returns, show=False)
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png', bbox_inches='tight')
+        buf.seek(0)
+        drawdown_img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        plt.close(fig)
+
+        # Calculate QuantStats metrics dictionary in full mode
+        metrics_dict = qs.reports.metrics(portfolio_returns, mode='full', display=False)
         return render_template('results.html',
-            summary_img=summary_img_url,
-            monthly_img=monthly_img_url,
-            drawdown_img=drawdown_img_url
+            summary_img=summary_img_base64,
+            monthly_img=monthly_img_base64,
+            drawdown_img=drawdown_img_base64,
+            metrics_dict=metrics_dict
         )
     except DataLoaderError as e:
         flash(f"Error fetching data: {str(e)}")

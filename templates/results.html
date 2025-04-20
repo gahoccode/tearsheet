@@ -18,19 +18,19 @@
             {% if summary_img %}
             <div class="mb-3">
                 <h5>Summary Snapshot</h5>
-                <img src="{{ summary_img }}" alt="Portfolio Summary" class="img-fluid rounded border">
+                <img src="data:image/png;base64,{{ summary_img }}" alt="Portfolio Summary" class="img-fluid rounded border">
             </div>
             {% endif %}
             {% if monthly_img %}
             <div class="mb-3">
                 <h5>Monthly Returns Heatmap</h5>
-                <img src="{{ monthly_img }}" alt="Monthly Heatmap" class="img-fluid rounded border">
+                <img src="data:image/png;base64,{{ monthly_img }}" alt="Monthly Heatmap" class="img-fluid rounded border">
             </div>
             {% endif %}
             {% if drawdown_img %}
             <div class="mb-3">
                 <h5>Drawdown</h5>
-                <img src="{{ drawdown_img }}" alt="Drawdown" class="img-fluid rounded border">
+                <img src="data:image/png;base64,{{ drawdown_img }}" alt="Drawdown" class="img-fluid rounded border">
             </div>
             {% endif %}
         </div>
