@@ -1,0 +1,75 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantstats Portfolio Analyzer</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Vietnam Stock Portfolio Analyzer</h1>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-danger" role="alert">
+                {% for message in messages %}{{ message }}<br>{% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+        <form action="/analyze" method="post">
+            <div class="mb-3">
+                <label class="form-label">Portfolio Composition</label>
+                <div class="row mb-2">
+                    <div class="col">
+                        <label for="symbol1" class="form-label">Symbol 1</label>
+                        <input type="text" class="form-control" id="symbol1" name="symbols[]" value="REE" required>
+                    </div>
+                    <div class="col">
+                        <label for="weight1" class="form-label">Weight</label>
+                        <input type="number" class="form-control" id="weight1" name="weights[]" value="0.7" min="0" max="1" step="0.01" required>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col">
+                        <label for="symbol2" class="form-label">Symbol 2</label>
+                        <input type="text" class="form-control" id="symbol2" name="symbols[]" value="FMC" required>
+                    </div>
+                    <div class="col">
+                        <label for="weight2" class="form-label">Weight</label>
+                        <input type="number" class="form-control" id="weight2" name="weights[]" value="0.2" min="0" max="1" step="0.01" required>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col">
+                        <label for="symbol3" class="form-label">Symbol 3</label>
+                        <input type="text" class="form-control" id="symbol3" name="symbols[]" value="DHC" required>
+                    </div>
+                    <div class="col">
+                        <label for="weight3" class="form-label">Weight</label>
+                        <input type="number" class="form-control" id="weight3" name="weights[]" value="0.1" min="0" max="1" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-text">Weights must sum to 1.0</div>
+            </div>
+            <div class="mb-3 row">
+                <div class="col">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" value="2023-01-01" required>
+                </div>
+                <div class="col">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" value="2025-04-15" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="capital" class="form-label">Initial Capital (VND)</label>
+                <input type="number" class="form-control" id="capital" name="capital" min="1000000" step="100000" value="500000000" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Analyze Portfolio</button>
+        </form>
+    </div>
+    <script src="/static/js/script.js"></script>
+</body>
+</html>

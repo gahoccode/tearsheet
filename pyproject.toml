@@ -1,0 +1,16 @@
+[project]
+name = "QuantstatsWebApp"
+version = "0.1.0"
+description = "Vietnam stock portfolio analysis web app using Flask, vnstock, and quantstats."
+authors = ["Your Name <your@email.com>"]
+dependencies = [
+    "flask==3.0.3",
+    "vnstock==3.2.2",
+    "quantstats==0.0.62",
+    "pandas==2.2.2",
+    "numpy==1.26.4",
+    "bootstrap-flask==2.3.3",
+    "tenacity==8.2.3",
+    "ipython==8.24.0"
+]
+requires-python = "==3.10.11"
