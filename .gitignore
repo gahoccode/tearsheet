@@ -106,3 +106,8 @@ Desktop.ini
 # Static reports
 *.png
 quantstats-results.html
+
+#windsurf
+.windsurfrules
+prd.md
+data.md
