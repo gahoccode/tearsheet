@@ -19,8 +19,8 @@ class FlaskAppIntegrationTest(unittest.TestCase):
         self.assertIn(b'Vietnam Stock Portfolio Analyzer', response.data)
         self.assertIn(b'Symbol 1', response.data)
 
-    def test_analyze_valid(self):
-        """Test POST /analyze with valid input."""
+    def test_analyze_valid_redirects_to_html_report(self):
+        """Test POST /analyze with valid input redirects to QuantStats HTML report."""
         data = {
             'symbols[]': ['REE', 'FMC', 'DHC'],
             'weights[]': ['0.7', '0.2', '0.1'],
@@ -28,9 +28,24 @@ class FlaskAppIntegrationTest(unittest.TestCase):
             'end_date': '2024-03-01',
             'capital': '10000000'
         }
-        response = self.app.post('/analyze', data=data, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Portfolio Analysis Results', response.data)
+        response = self.app.post('/analyze', data=data, follow_redirects=False)
+        # Should redirect (302) to static/reports/quantstats-results.html
+        self.assertIn(response.status_code, (301, 302))
+        self.assertIn('/static/reports/quantstats-results.html', response.headers.get('Location', ''))
+
+    def test_html_report_file_created(self):
+        """Test that QuantStats HTML report file is created after valid POST."""
+        import os
+        data = {
+            'symbols[]': ['REE', 'FMC', 'DHC'],
+            'weights[]': ['0.7', '0.2', '0.1'],
+            'start_date': '2024-01-01',
+            'end_date': '2024-03-01',
+            'capital': '10000000'
+        }
+        self.app.post('/analyze', data=data, follow_redirects=False)
+        report_path = os.path.join(os.path.dirname(__file__), '../static/reports/quantstats-results.html')
+        self.assertTrue(os.path.exists(report_path))
 
     def test_analyze_invalid_weights(self):
         """Test POST /analyze with weights not summing to 1."""

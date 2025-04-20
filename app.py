@@ -106,14 +106,30 @@ def analyze():
         drawdown_img_base64 = base64.b64encode(buf.read()).decode('utf-8')
         plt.close(fig)
 
-        # Calculate QuantStats metrics dictionary in full mode
-        metrics_dict = qs.reports.metrics(portfolio_returns, mode='full', display=False)
-        return render_template('results.html',
-            summary_img=summary_img_base64,
-            monthly_img=monthly_img_base64,
-            drawdown_img=drawdown_img_base64,
-            metrics_dict=metrics_dict
-        )
+        # Generate QuantStats HTML report
+        reports_dir = os.path.join(static_dir, 'reports')
+        os.makedirs(reports_dir, exist_ok=True)
+        html_report_path = os.path.join(reports_dir, 'quantstats-results.html')
+        try:
+            qs.reports.html(
+                portfolio_returns,
+                benchmark=None,
+                rf=0.0,
+                grayscale=False,
+                title='Strategy Tearsheet',
+                output=html_report_path,
+                compounded=True,
+                periods_per_year=252,
+                download_filename='quantstats-results.html',
+                figfmt='svg',
+                template_path=None,
+                match_dates=True
+            )
+        except Exception as report_ex:
+            flash(f'Failed to generate QuantStats HTML report: {report_ex}')
+            return render_template('index.html'), 200
+        # Redirect to the generated HTML report
+        return redirect(url_for('static', filename='reports/quantstats-results.html'))
     except DataLoaderError as e:
         flash(f"Error fetching data: {str(e)}")
         return render_template('index.html'), 200
