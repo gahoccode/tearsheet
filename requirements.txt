@@ -1,7 +1,7 @@
 # Project dependencies for QuantstatsWebApp
 flask==3.0.3
-vnstock==3.2.2
-quantstats==0.0.62
+vnstock==3.2.6
+quantstats==0.0.69
 pandas==2.2.2
 numpy==1.26.4
 bootstrap-flask==2.3.3
