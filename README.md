@@ -86,5 +86,49 @@ pytest tests/test_app.py
 - **Navigation:** For best UX, add a "Back to Home" button/link in the QuantStats HTML report pointing to `/`.
 - **Static report cleanup:** The generated HTML report (`static/reports/quantstats-results.html`) may be overwritten on each new analysis.
 
+## Container Deployment with GHCR
+
+### GitHub Container Registry (GHCR) Workflow
+
+This repository includes an automated workflow to build and publish Docker images to GitHub Container Registry (GHCR) on every push to `main` or `master` branches.
+
+#### How it works
+- **Trigger**: Workflow runs automatically on push to main/master branches
+- **Build**: Uses Docker Buildx for multi-platform builds
+- **Publish**: Pushes to `ghcr.io/{username}/quantstatswebapp`
+- **Tags**: Includes branch name, commit SHA, and `latest` for main branch
+
+#### Usage
+
+1. **Enable GitHub Packages**: Ensure GitHub Packages is enabled for your repository
+2. **Set Permissions**: The workflow automatically uses `GITHUB_TOKEN` for authentication
+3. **View Images**: Published images appear in your repository's "Packages" section
+
+#### Pull the image
+
+```bash
+docker pull ghcr.io/{your-username}/quantstatswebapp:latest
+```
+
+#### Run the container
+
+```bash
+docker run -p 5000:5000 -e PORT=5000 ghcr.io/{your-username}/quantstatswebapp:latest
+```
+
+#### Manual Build (Optional)
+
+If you want to build locally:
+
+```bash
+docker build -t quantstatswebapp .
+docker run -p 5000:5000 -e PORT=5000 quantstatswebapp
+```
+
+### Environment Variables
+
+The container accepts the following environment variables:
+- `PORT`: Port to run the application on (default: 5000)
+
 ## License
 MIT
