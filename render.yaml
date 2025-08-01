@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: quantstats-webapp
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free  # or starter/standard
+    region: ohio  # or oregon, frankfurt, singapore
+    branch: main
+    dockerCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120 --workers 2
+    healthCheckPath: /health
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PORT
+        value: 10000  # Render uses port 10000
+      - key: SECRET_KEY
+        sync: false  # This will be set manually in Render dashboard
+      - key: PYTHONUNBUFFERED
+        value: 1

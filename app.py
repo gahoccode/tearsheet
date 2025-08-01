@@ -14,9 +14,13 @@ import base64
 import matplotlib
 matplotlib.use('Agg')  # Use non-GUI backend for server-side image generation
 matplotlib.rcParams['font.family'] = 'DejaVu Sans'  # Use a Linux-safe font
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'dev')  # For flash messages
+app.secret_key = os.environ.get('SECRET_KEY')
+if not app.secret_key:
+    raise ValueError("SECRET_KEY environment variable must be set")
 
 @app.route('/', methods=['GET'])
 def index():

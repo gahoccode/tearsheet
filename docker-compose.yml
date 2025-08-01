@@ -4,9 +4,11 @@ services:
     build: .
     container_name: quantstatswebapp
     ports:
-      - "5000:5000"
+      - "5001:5000"
     environment:
-      - SECRET_KEY=dev
+      #- SECRET_KEY=${SECRET_KEY}
+      #- FLASK_ENV=${FLASK_ENV:-production}
+      - .env
     volumes:
       - .:/app
     restart: unless-stopped
