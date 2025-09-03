@@ -51,10 +51,23 @@ export interface AnalysisSummary {
   total_capital: number;
 }
 
+export interface PlotlyChartData {
+  data: any[];
+  layout: any;
+}
+
+export interface PlotlyCharts {
+  performance: PlotlyChartData;
+  drawdown: PlotlyChartData;
+  composition: PlotlyChartData;
+  metrics_dashboard: PlotlyChartData;
+}
+
 export interface PortfolioAnalysisResponse {
   portfolio: Portfolio;
   metrics: PerformanceMetrics;
   returns: ReturnsData;
+  charts: PlotlyCharts;
   analysis_summary: AnalysisSummary;
 }
 

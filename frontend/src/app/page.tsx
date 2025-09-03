@@ -3,9 +3,7 @@
 import { useState } from 'react';
 import PortfolioForm from '@/components/PortfolioForm';
 import MetricsDashboard from '@/components/MetricsDashboard';
-import PerformanceChart from '@/components/charts/PerformanceChart';
-import DrawdownChart from '@/components/charts/DrawdownChart';
-import CompositionChart from '@/components/charts/CompositionChart';
+import DynamicPlotlyChart from '@/components/charts/DynamicPlotlyChart';
 import { PortfolioAnalysisResponse } from '@/types/portfolio';
 
 export default function HomePage() {
@@ -74,22 +72,29 @@ export default function HomePage() {
             </div>
 
             {/* Portfolio Composition */}
-            <CompositionChart 
-              stocks={analysisData.portfolio.stocks} 
-              capital={analysisData.portfolio.capital}
+            <DynamicPlotlyChart 
+              data={analysisData.charts.composition.data}
+              layout={analysisData.charts.composition.layout}
+              title="Portfolio Composition"
             />
 
             {/* Performance Metrics Dashboard */}
-            <MetricsDashboard metrics={analysisData.metrics} />
+            <DynamicPlotlyChart 
+              data={analysisData.charts.metrics_dashboard.data}
+              layout={analysisData.charts.metrics_dashboard.layout}
+              title="Performance Metrics Dashboard"
+            />
 
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <PerformanceChart 
-                returns={analysisData.returns} 
+              <DynamicPlotlyChart 
+                data={analysisData.charts.performance.data}
+                layout={analysisData.charts.performance.layout}
                 title="Portfolio Performance Over Time"
               />
-              <DrawdownChart 
-                returns={analysisData.returns} 
+              <DynamicPlotlyChart 
+                data={analysisData.charts.drawdown.data}
+                layout={analysisData.charts.drawdown.layout}
                 title="Portfolio Drawdown Analysis"
               />
             </div>
@@ -125,7 +130,7 @@ export default function HomePage() {
                   <li><strong>Analysis Method:</strong> Portfolio returns calculated using weighted average of individual stock returns</li>
                   <li><strong>Risk Metrics:</strong> Calculated based on daily return volatility and drawdown analysis</li>
                   <li><strong>Currency:</strong> Vietnamese Dong (VND)</li>
-                  <li><strong>Charts:</strong> Interactive visualizations built with Recharts</li>
+                  <li><strong>Charts:</strong> Interactive visualizations built with Plotly</li>
                 </ul>
               </div>
             </div>

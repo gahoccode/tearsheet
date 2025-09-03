@@ -15,6 +15,7 @@ from src.core.data_fetcher import DataFetcher
 from src.core.portfolio_analyzer import PortfolioAnalyzer
 from src.services.validation_service import ValidationService
 from src.services.vnstock_service import VnstockService
+from src.services.chart_data_service import ChartDataService
 from src.models.portfolio import Portfolio
 from src.utils.exceptions import ValidationError, DataFetchError, AnalysisError
 from src.utils.helpers import setup_logging
@@ -30,6 +31,7 @@ validation_service = ValidationService()
 data_fetcher = DataFetcher()
 portfolio_analyzer = PortfolioAnalyzer()
 vnstock_service = VnstockService()
+chart_data_service = ChartDataService()
 
 # Set up logging
 setup_logging(level="INFO")
@@ -114,6 +116,23 @@ def analyze():
         except AnalysisError as e:
             return jsonify({"error": f"Error calculating metrics: {str(e)}"}), 500
 
+        # Generate Plotly chart data
+        try:
+            performance_chart = chart_data_service.create_portfolio_performance_data(
+                portfolio_returns, title="Portfolio Performance Over Time"
+            )
+            drawdown_chart = chart_data_service.create_drawdown_data(
+                portfolio_returns, title="Portfolio Drawdown Analysis"
+            )
+            composition_chart = chart_data_service.create_composition_data(
+                portfolio.symbols, portfolio.weights, title="Portfolio Composition"
+            )
+            metrics_dashboard = chart_data_service.create_metrics_dashboard_data(
+                metrics, title="Performance Metrics Dashboard"
+            )
+        except AnalysisError as e:
+            return jsonify({"error": f"Error creating chart data: {str(e)}"}), 500
+
         # Prepare response data
         response_data = {
             "portfolio": portfolio.to_dict(),
@@ -122,6 +141,12 @@ def analyze():
                 "data": {date.isoformat(): value for date, value in portfolio_returns.items()},
                 "dates": [date.isoformat() for date in portfolio_returns.index],
                 "values": portfolio_returns.tolist(),
+            },
+            "charts": {
+                "performance": performance_chart,
+                "drawdown": drawdown_chart,
+                "composition": composition_chart,
+                "metrics_dashboard": metrics_dashboard,
             },
             "analysis_summary": {
                 "data_points": len(portfolio_returns),

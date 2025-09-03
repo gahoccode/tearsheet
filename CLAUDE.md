@@ -67,7 +67,7 @@ tearsheet/
 - **Next.js 15**: App Router with Server Components and Turbopack
 - **TypeScript**: Full type safety throughout the application
 - **Tailwind CSS**: Utility-first responsive design
-- **Recharts**: Interactive D3-based visualizations
+- **Plotly.js**: Interactive chart library with advanced visualizations
 - **React Query**: Advanced data fetching and caching
 - **React Hook Form + Zod**: Form handling with schema validation
 
@@ -79,7 +79,7 @@ tearsheet/
 5. vnstock API fetches Vietnam stock data via `Quote.history()`
 6. Portfolio returns calculated using weighted sum of individual stock returns
 7. JSON response sent back to frontend with metrics and analysis data
-8. Frontend renders interactive charts and analytics using Recharts
+8. Frontend renders interactive charts and analytics using Plotly.js
 
 ### Key Dependencies
 
@@ -96,7 +96,7 @@ tearsheet/
 - **React 19**: Latest React with improved performance
 - **TypeScript**: Type safety and development experience
 - **Tailwind CSS 4**: Utility-first CSS framework
-- **Recharts**: Interactive D3-based charts and visualizations
+- **Plotly.js**: Interactive chart library with advanced visualizations (v2.35.2)
 - **TanStack Query**: Data fetching, caching, and state management
 - **React Hook Form**: Form handling with performance optimization
 - **Zod**: TypeScript-first schema validation
@@ -129,6 +129,34 @@ NODE_ENV=development
 NEXT_PUBLIC_API_TIMEOUT=30000
 ```
 
+### Plotly.js Chart Implementation
+
+#### Chart Data Service (Backend)
+- **File**: `backend/src/services/chart_data_service.py`
+- **Purpose**: Generates Plotly chart data configurations instead of HTML
+- **Returns**: JSON objects with `data` and `layout` properties for frontend consumption
+- **Chart Types**:
+  - Portfolio Performance: Line chart showing cumulative returns over time
+  - Drawdown Analysis: Area chart displaying portfolio drawdowns
+  - Portfolio Composition: Pie chart with asset allocation percentages
+  - Metrics Dashboard: Bar chart with key performance indicators
+
+#### Dynamic Plotly Component (Frontend)
+- **File**: `frontend/src/components/charts/DynamicPlotlyChart.tsx`
+- **CDN Version**: Plotly.js v2.35.2 (loads dynamically from CDN)
+- **Features**: 
+  - Responsive design with automatic resizing
+  - Interactive controls (zoom, pan, hover tooltips)
+  - Error handling with fallback UI
+  - TypeScript support with proper type definitions
+- **Usage**: Accepts `data`, `layout`, and optional `config` props
+
+#### Chart Integration Notes
+- **Backend Response**: API returns chart configurations as JSON objects
+- **Frontend Rendering**: Charts render client-side using dynamically loaded Plotly.js
+- **Performance**: CDN loading reduces bundle size, charts cached after first load
+- **Compatibility**: Works with React 19 and Next.js 15 with Turbopack
+
 ### Testing Strategy
 
 #### Backend Testing
@@ -141,7 +169,7 @@ NEXT_PUBLIC_API_TIMEOUT=30000
 - **Component Testing**: React component rendering and user interactions
 - **API Integration**: Frontend-to-backend API communication
 - **Form Validation**: Client-side validation with Zod schemas
-- **Chart Rendering**: Recharts visualization accuracy
+- **Chart Rendering**: Plotly.js visualization accuracy
 
 #### Full Stack Testing
 - **End-to-End**: Complete user workflows from form submission to chart display

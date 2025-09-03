@@ -89,7 +89,7 @@ class VisualizationService:
             fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='#f0f0f0')
 
             # Convert to HTML
-            return pyo.plot(fig, output_type='div', include_plotlyjs=True)
+            return pyo.plot(fig, output_type='div', include_plotlyjs='cdn')
 
         except Exception as e:
             logger.error(f"Error creating portfolio performance chart: {e}")
@@ -156,7 +156,7 @@ class VisualizationService:
             fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='#f0f0f0')
             fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='#f0f0f0')
 
-            return pyo.plot(fig, output_type='div', include_plotlyjs=False)
+            return pyo.plot(fig, output_type='div', include_plotlyjs='cdn')
 
         except Exception as e:
             logger.error(f"Error creating drawdown chart: {e}")
@@ -226,7 +226,7 @@ class VisualizationService:
                 **self.default_theme['layout']
             )
 
-            return pyo.plot(fig, output_type='div', include_plotlyjs=False)
+            return pyo.plot(fig, output_type='div', include_plotlyjs='cdn')
 
         except Exception as e:
             logger.error(f"Error creating monthly returns heatmap: {e}")
@@ -316,7 +316,7 @@ class VisualizationService:
                 **self.default_theme['layout']
             )
 
-            return pyo.plot(fig, output_type='div', include_plotlyjs=False)
+            return pyo.plot(fig, output_type='div', include_plotlyjs='cdn')
 
         except Exception as e:
             logger.error(f"Error creating performance dashboard: {e}")
@@ -360,7 +360,7 @@ class VisualizationService:
                 **self.default_theme['layout']
             )
 
-            return pyo.plot(fig, output_type='div', include_plotlyjs=False)
+            return pyo.plot(fig, output_type='div', include_plotlyjs='cdn')
 
         except Exception as e:
             logger.error(f"Error creating composition chart: {e}")
@@ -416,7 +416,7 @@ class VisualizationService:
             fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='#f0f0f0')
             fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='#f0f0f0')
 
-            return pyo.plot(fig, output_type='div', include_plotlyjs=False)
+            return pyo.plot(fig, output_type='div', include_plotlyjs='cdn')
 
         except Exception as e:
             logger.error(f"Error creating ratio comparison chart: {e}")
