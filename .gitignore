@@ -111,3 +111,6 @@ quantstats-results.html
 .windsurfrules
 prd.md
 data.md
+
+# MCP configuration with API keys
+.mcp.json
