@@ -2,75 +2,89 @@
 
 ## Overview
 
-The Tearsheet Portfolio Analyzer is deployed as a containerized web application designed for both development and production environments. The architecture supports Docker-based deployment with flexible configuration management and scalable infrastructure.
+The Tearsheet Portfolio Analyzer follows a modern **Next.js + Flask API** architecture with complete separation of frontend and backend containers. This microservices approach enables independent scaling, deployment, and technology choices for each component.
 
 ## Container Structure
 
 ```mermaid
 C4Container
-    title Container Diagram - Tearsheet Portfolio Analyzer
+    title Container Diagram - Tearsheet Portfolio Analyzer (Modern Architecture)
 
     Person(user, "End User", "Investors, analysts, advisors")
     
     System_Boundary(tearsheet_system, "Tearsheet System") {
-        Container(web_app, "Web Application", "Python/Flask", "Main application server handling portfolio analysis and financial ratios")
-        Container(static_files, "Static Assets", "Nginx/File System", "CSS, JavaScript, generated reports")
-        Container(temp_storage, "Temporary Storage", "File System", "Generated reports and temporary files")
+        Container(frontend, "Frontend Application", "Next.js/React", "Interactive portfolio analysis interface with TypeScript and Tailwind CSS")
+        Container(backend, "Backend API", "Python/Flask", "JSON API server handling portfolio analysis and financial ratios")
     }
     
     System_Ext(vnstock_api, "VNStock API", "External service providing Vietnam stock market data")
-    System_Ext(quantstats, "QuantStats", "Python library for portfolio analytics")
     System_Ext(load_balancer, "Load Balancer", "Traffic distribution and SSL termination")
     
     Rel(user, load_balancer, "HTTPS requests")
-    Rel(load_balancer, web_app, "HTTP requests", "Port 5000")
-    Rel(web_app, static_files, "Serves static content")
-    Rel(web_app, temp_storage, "Reads/writes reports")
-    Rel(web_app, vnstock_api, "Fetches market data", "HTTPS/REST")
-    Rel(web_app, quantstats, "Generates analytics", "Python library")
+    Rel(load_balancer, frontend, "Static content", "Port 3000")
+    Rel(frontend, backend, "API requests", "Port 5001/CORS")
+    Rel(backend, vnstock_api, "Fetches market data", "HTTPS/REST")
     
     UpdateRelStyle(user, load_balancer, $offsetY="-10")
-    UpdateRelStyle(web_app, vnstock_api, $offsetY="10")
+    UpdateRelStyle(frontend, backend, $offsetY="5")
+    UpdateRelStyle(backend, vnstock_api, $offsetY="10")
 ```
 
 ## Container Details
 
-### Web Application Container
+### Frontend Container (Next.js)
+
+#### Technology Stack
+- **Base Image**: Node.js 18+ Alpine Linux
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4
+- **Charts**: Recharts (React + D3)
+- **Data Fetching**: TanStack Query (React Query)
+
+#### Container Configuration
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "run", "start"]
+```
+
+#### Resource Requirements
+- **CPU**: 0.5-1 cores
+- **Memory**: 512MB-1GB RAM
+- **Storage**: 500MB for application and static assets
+- **Network**: Outbound HTTPS for API calls to backend
+
+### Backend Container (Flask API)
 
 #### Technology Stack
 - **Base Image**: Python 3.9+ Alpine Linux
-- **Framework**: Flask web framework
+- **Framework**: Flask JSON API with Flask-CORS
 - **WSGI Server**: Gunicorn for production
-- **Dependencies**: pandas, numpy, quantstats, vnstock, matplotlib
+- **Dependencies**: pandas, numpy, vnstock, matplotlib
+- **Port**: 5001 (to avoid macOS AirPlay conflicts)
 
 #### Container Configuration
 ```dockerfile
 FROM python:3.9-alpine
 WORKDIR /app
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 5000
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5000", "--timeout", "120"]
+COPY backend/ .
+EXPOSE 5001
+CMD ["gunicorn", "api:app", "--bind", "0.0.0.0:5001", "--timeout", "120"]
 ```
 
 #### Resource Requirements
 - **CPU**: 1-2 cores
 - **Memory**: 1-2 GB RAM
-- **Storage**: 1 GB for application and temporary files
-- **Network**: Outbound HTTPS for API calls
-
-### Static Assets Container (Optional)
-
-#### Purpose
-- Serve CSS, JavaScript, and image files
-- Handle generated HTML reports
-- Offload static content from main application
-
-#### Technology
-- **Web Server**: Nginx or Apache
-- **Caching**: Long-term caching for assets
-- **Compression**: Gzip compression enabled
+- **Storage**: 1 GB for application and dependencies
+- **Network**: Outbound HTTPS for vnstock API calls
 
 ### Deployment Configurations
 
@@ -80,27 +94,33 @@ CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5000", "--timeout", "120"]
 ```yaml
 version: '3.8'
 services:
-  web:
-    build: .
+  backend:
+    build: 
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
-      - FLASK_ENV=development
       - SECRET_KEY=${SECRET_KEY}
+      - PORT=5001
     volumes:
-      - .:/app
-      - /app/.venv  # Exclude virtual environment
+      - ./backend:/app
     restart: unless-stopped
   
-  nginx:
-    image: nginx:alpine
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     ports:
-      - "80:80"
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:5001
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./static:/usr/share/nginx/html/static
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
-      - web
+      - backend
+    restart: unless-stopped
 ```
 
 ### Development Features

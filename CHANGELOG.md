@@ -6,26 +6,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [2.0.0] - 2025-01-03
 ### Added
-- Claude Code configuration and documentation
-- Comprehensive testing suite with integration and unit tests
-- QuantStats HTML tearsheet generation and redirection
-- Vietnam stock portfolio analysis functionality
-- Custom CSS styling (replacing Bootstrap)
-- Docker containerization support
-- GitHub Container Registry (GHCR) workflow
-- Render.com deployment configuration
-- Dynamic port configuration for cloud deployment
+- **Modern Next.js Frontend**: Complete Next.js 15 application with App Router and Server Components
+- **TypeScript Integration**: Full type safety throughout the frontend application
+- **Interactive Visualizations**: Recharts-based charts replacing static HTML reports
+- **Real-time Data Fetching**: TanStack Query (React Query) for advanced data fetching and caching
+- **Modern UI Framework**: Tailwind CSS 4 utility-first responsive design
+- **Form Validation**: React Hook Form with Zod schema validation
+- **Financial Ratios Page**: Comprehensive financial ratios analysis interface
+- **API Health Checks**: Backend health monitoring endpoints
+- **CORS Support**: Cross-origin resource sharing for API communication
+- **Error Boundaries**: Comprehensive error handling across frontend and backend
+- **Development Tooling**: ESLint, Prettier, and TypeScript configuration
+- **Production Optimization**: Next.js build optimization with Turbopack
 
 ### Changed
-- Project renamed to "tearsheet"
-- UI framework from Bootstrap to custom CSS styling
-- Matplotlib font to DejaVu Sans for Linux compatibility
-- Dependencies updated to latest versions
+- **Architecture**: Transformed from monolithic Flask SSR to modern Next.js + Flask API microservices
+- **Data Flow**: JSON API communication replacing server-side rendering
+- **Port Configuration**: Backend moved to port 5001 (avoiding macOS AirPlay conflicts)
+- **Visualization Engine**: Replaced static QuantStats reports with interactive Recharts
+- **Directory Structure**: Separated backend/ and frontend/ directories
+- **Development Workflow**: Dual-terminal development with independent frontend/backend servers
+- **Documentation**: Updated architecture documentation and development guides
+
+### Removed
+- **Server-side Rendering**: Replaced Flask templates with React components
+- **Static HTML Reports**: Removed QuantStats HTML tearsheet generation
+- **Bootstrap Dependency**: Replaced with Tailwind CSS
+- **Monolithic Structure**: Split into microservices architecture
 
 ### Fixed
-- Server-side rendering issues with matplotlib backend set to 'Agg'
-- Cross-platform deployment compatibility
+- **JSON Serialization**: Resolved pandas Timestamp serialization issues in API responses
+- **Data Structure**: Fixed portfolio symbols data structure mismatch
+- **Cross-origin Requests**: Proper CORS configuration between frontend and backend
+- **Type Safety**: Eliminated runtime type errors with comprehensive TypeScript integration
 
 ## [1.0.0] - 2024-08-01
 ### Added

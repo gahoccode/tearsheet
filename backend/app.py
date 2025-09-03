@@ -4,33 +4,33 @@ Flask backend for QuantstatsWebApp.
 Implements '/' and '/analyze' routes per PRD.
 """
 
-from flask import Flask, render_template, request, redirect, url_for, flash
 import os
-import io
-import base64
-
 import matplotlib
-
-matplotlib.use("Agg")  # Use non-GUI backend for server-side image generation
-matplotlib.rcParams["font.family"] = "DejaVu Sans"  # Use a Linux-safe font
+from flask import Flask, render_template, request, flash
 from dotenv import load_dotenv
-
-load_dotenv()
 
 # Import new modular services
 from src.core.data_fetcher import DataFetcher
 from src.core.portfolio_analyzer import PortfolioAnalyzer
 from src.services.validation_service import ValidationService
 from src.services.vnstock_service import VnstockService
+from src.services.visualization_service import VisualizationService
 from src.models.portfolio import Portfolio
 from src.utils.exceptions import ValidationError, DataFetchError, AnalysisError
 from src.utils.helpers import setup_logging
+
+# Configure matplotlib
+matplotlib.use("Agg")  # Use non-GUI backend for server-side image generation
+matplotlib.rcParams["font.family"] = "DejaVu Sans"  # Use a Linux-safe font
+
+load_dotenv()
 
 # Initialize services
 validation_service = ValidationService()
 data_fetcher = DataFetcher()
 portfolio_analyzer = PortfolioAnalyzer()
 vnstock_service = VnstockService()
+visualization_service = VisualizationService()
 
 # Set up logging
 setup_logging(level="INFO")
@@ -103,65 +103,46 @@ def analyze():
             flash(f"Analysis error: {str(e)}")
             return render_template("index.html"), 200
 
-        # Generate QuantStats static images (PNG/SVG) using quantstats.reports.full()
-        import quantstats as qs
-        import matplotlib.pyplot as plt
-        import uuid
-
-        # Ensure static directory exists
-        static_dir = os.path.join(os.path.dirname(__file__), "static")
-        os.makedirs(static_dir, exist_ok=True)
-        # Unique prefix for this analysis
-        unique_id = uuid.uuid4().hex[:8]
-
-        # Generate QuantStats summary snapshot
-        fig = qs.plots.snapshot(portfolio_returns, show=False)
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png", bbox_inches="tight")
-        buf.seek(0)
-        summary_img_base64 = base64.b64encode(buf.read()).decode("utf-8")
-        plt.close(fig)
-
-        # Generate QuantStats monthly returns heatmap
-        fig = qs.plots.monthly_heatmap(portfolio_returns, show=False)
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png", bbox_inches="tight")
-        buf.seek(0)
-        monthly_img_base64 = base64.b64encode(buf.read()).decode("utf-8")
-        plt.close(fig)
-
-        # Generate QuantStats drawdown plot
-        fig = qs.plots.drawdown(portfolio_returns, show=False)
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png", bbox_inches="tight")
-        buf.seek(0)
-        drawdown_img_base64 = base64.b64encode(buf.read()).decode("utf-8")
-        plt.close(fig)
-
-        # Generate QuantStats HTML report
-        reports_dir = os.path.join(static_dir, "reports")
-        os.makedirs(reports_dir, exist_ok=True)
-        html_report_path = os.path.join(reports_dir, "quantstats-results.html")
+        # Calculate performance metrics
         try:
-            qs.reports.html(
-                portfolio_returns,
-                benchmark=None,
-                rf=0.0,
-                grayscale=False,
-                title="Strategy Tearsheet",
-                output=html_report_path,
-                compounded=True,
-                periods_per_year=252,
-                download_filename="quantstats-results.html",
-                figfmt="svg",
-                template_path=None,
-                match_dates=True,
-            )
-        except Exception as report_ex:
-            flash(f"Failed to generate QuantStats HTML report: {report_ex}")
+            metrics = portfolio_analyzer.calculate_performance_metrics(portfolio_returns)
+        except AnalysisError as e:
+            flash(f"Error calculating metrics: {str(e)}")
             return render_template("index.html"), 200
-        # Redirect to the generated HTML report
-        return redirect(url_for("static", filename="reports/quantstats-results.html"))
+
+        # Generate interactive Plotly charts
+        try:
+            performance_chart = visualization_service.create_portfolio_performance_chart(
+                portfolio_returns, "Portfolio Performance Over Time"
+            )
+            drawdown_chart = visualization_service.create_drawdown_chart(
+                portfolio_returns, "Portfolio Drawdown Analysis"
+            )
+            monthly_heatmap = visualization_service.create_monthly_returns_heatmap(
+                portfolio_returns, "Monthly Returns Heatmap"
+            )
+            metrics_dashboard = visualization_service.create_performance_metrics_dashboard(
+                metrics, "Performance Metrics Dashboard"
+            )
+            composition_chart = visualization_service.create_portfolio_composition_chart(
+                portfolio.symbols, portfolio.weights, "Portfolio Composition"
+            )
+        except AnalysisError as e:
+            flash(f"Error generating charts: {str(e)}")
+            return render_template("index.html"), 200
+
+        # Render interactive analysis page instead of redirecting to static HTML
+        return render_template(
+            "analysis_results.html",
+            portfolio=portfolio,
+            metrics=metrics,
+            performance_chart=performance_chart,
+            drawdown_chart=drawdown_chart,
+            monthly_heatmap=monthly_heatmap,
+            metrics_dashboard=metrics_dashboard,
+            composition_chart=composition_chart,
+            returns_data=portfolio_returns
+        )
     except (ValidationError, DataFetchError, AnalysisError) as e:
         flash(f"Error: {str(e)}")
         return render_template("index.html"), 200

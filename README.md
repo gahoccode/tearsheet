@@ -1,15 +1,41 @@
-# Tearsheet
+# Vietnam Stock Portfolio Analyzer
 
-A Python web application for Vietnam stock portfolio analysis using Flask, vnstock, and quantstats.
+A modern full-stack application for analyzing Vietnamese stock portfolios with interactive visualizations and comprehensive performance metrics.
+
+## Architecture
+
+This application follows a modern **Next.js + Flask API** architecture with complete separation of frontend and backend:
+
+```
+tearsheet/
+├── backend/           # Flask API server
+│   ├── api.py        # Main API endpoints
+│   ├── src/          # Core business logic
+│   └── tests/        # API tests
+└── frontend/         # Next.js application
+    ├── src/          # React components & utilities
+    └── public/       # Static assets
+```
 
 ## Features
-- Fetches historical price data for user-selected Vietnam stock tickers using vnstock
-- Simulates portfolio performance and computes key metrics (returns, Sharpe, drawdown, etc.)
-- Generates interactive charts and downloadable QuantStats HTML tear sheet
-- Responsive custom CSS UI
-- **/analyze** route generates a QuantStats HTML report and redirects users to `/static/reports/quantstats-results.html` for a full tear sheet
-- "Back to Home" navigation is recommended for user-friendly return to the main page
-- Integrated tests verify routing, HTML file creation, and Matplotlib backend
+
+### 📊 Portfolio Analysis
+- **Interactive Charts**: Performance, drawdown, and composition analysis using Recharts
+- **Risk Metrics**: Sharpe ratio, volatility, maximum drawdown analysis
+- **Performance Tracking**: Returns, win rate, risk assessment
+- **Vietnamese Market Data**: Real-time integration with vnstock API
+
+### 🎨 Modern Frontend
+- **Next.js 15**: App Router with Server Components and Turbopack
+- **TypeScript**: Full type safety throughout the application
+- **Tailwind CSS**: Utility-first responsive design
+- **React Query**: Advanced data fetching and state management
+- **React Hook Form + Zod**: Form handling with schema validation
+
+### 🔧 Robust Backend
+- **Flask API**: JSON-only endpoints with CORS support
+- **Data Validation**: Comprehensive input validation and error handling
+- **Modular Architecture**: Clean separation of concerns
 
 ## Project Structure
 - app.py: Flask backend (**implemented**)

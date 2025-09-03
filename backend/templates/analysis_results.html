@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Analysis Results - Vietnam Stock Analyzer</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .chart-container {
+            margin: 2rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .metrics-summary {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            border-left: 4px solid #1a237e;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1a237e;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .portfolio-info {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .info-value {
+            color: #666;
+        }
+        
+        .export-section {
+            margin-top: 3rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .action-buttons {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .action-buttons .button {
+            margin: 0 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .info-value {
+                margin-top: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="qs-container">
+        <!-- Navigation -->
+        <nav class="qs-nav qs-mb-4">
+            <div class="qs-nav-links">
+                <a href="/" class="qs-nav-link">Portfolio Analysis</a>
+                <a href="/ratios" class="qs-nav-link">Financial Ratios</a>
+            </div>
+        </nav>
+
+        <h1 class="qs-mb-4">Portfolio Analysis Results</h1>
+
+        <!-- Portfolio Information -->
+        <div class="portfolio-info">
+            <h2 style="margin-top: 0;">Portfolio Overview</h2>
+            <div class="info-row">
+                <span class="info-label">Portfolio Name:</span>
+                <span class="info-value">{{ portfolio.name or 'Unnamed Portfolio' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Symbols:</span>
+                <span class="info-value">{{ portfolio.symbols|join(', ') }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Analysis Period:</span>
+                <span class="info-value">{{ portfolio.start_date }} to {{ portfolio.end_date }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Initial Capital:</span>
+                <span class="info-value">{{ "{:,.0f}".format(portfolio.capital) }} VND</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Number of Stocks:</span>
+                <span class="info-value">{{ portfolio.size }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Data Points:</span>
+                <span class="info-value">{{ returns_data|length }} trading days</span>
+            </div>
+        </div>
+
+        <!-- Key Metrics Summary -->
+        <div class="metrics-summary">
+            <h2 style="margin-top: 0;">Performance Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">
+                        {% if metrics.total_return %}
+                            {{ "{:.2f}%".format(metrics.total_return * 100) }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="metric-label">Total Return</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">
+                        {% if metrics.annualized_return %}
+                            {{ "{:.2f}%".format(metrics.annualized_return * 100) }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="metric-label">Annualized Return</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">
+                        {% if metrics.volatility %}
+                            {{ "{:.2f}%".format(metrics.volatility * 100) }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="metric-label">Volatility</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">
+                        {% if metrics.sharpe_ratio %}
+                            {{ "{:.2f}".format(metrics.sharpe_ratio) }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="metric-label">Sharpe Ratio</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">
+                        {% if metrics.max_drawdown %}
+                            {{ "{:.2f}%".format(metrics.max_drawdown * 100) }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="metric-label">Max Drawdown</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-value">
+                        {% if metrics.win_rate %}
+                            {{ "{:.1f}%".format(metrics.win_rate * 100) }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="metric-label">Win Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Composition Chart -->
+        {% if composition_chart %}
+        <div class="chart-container">
+            <h2>Portfolio Composition</h2>
+            {{ composition_chart|safe }}
+        </div>
+        {% endif %}
+
+        <!-- Performance Metrics Dashboard -->
+        {% if metrics_dashboard %}
+        <div class="chart-container">
+            <h2>Performance Dashboard</h2>
+            {{ metrics_dashboard|safe }}
+        </div>
+        {% endif %}
+
+        <!-- Interactive Charts Grid -->
+        <div class="chart-grid">
+            <!-- Portfolio Performance Chart -->
+            {% if performance_chart %}
+            <div class="chart-container">
+                <h2>Portfolio Performance</h2>
+                {{ performance_chart|safe }}
+            </div>
+            {% endif %}
+
+            <!-- Drawdown Chart -->
+            {% if drawdown_chart %}
+            <div class="chart-container">
+                <h2>Drawdown Analysis</h2>
+                {{ drawdown_chart|safe }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Monthly Returns Heatmap -->
+        {% if monthly_heatmap %}
+        <div class="chart-container">
+            <h2>Monthly Returns</h2>
+            {{ monthly_heatmap|safe }}
+        </div>
+        {% endif %}
+
+        <!-- Export Options -->
+        <div class="export-section">
+            <h3>Export Options</h3>
+            <p>Interactive charts can be exported directly using the modebar (top-right of each chart).</p>
+            <p>Available formats: PNG, SVG, PDF. Click the camera icon on any chart to download.</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="/" class="button">← New Analysis</a>
+            <a href="/ratios" class="button secondary">Financial Ratios</a>
+        </div>
+
+        <!-- Data Information -->
+        <div class="qs-info-section qs-mt-5">
+            <h3>Data Information</h3>
+            <ul>
+                <li><strong>Data Source:</strong> vnstock API</li>
+                <li><strong>Analysis Framework:</strong> Interactive Plotly visualizations</li>
+                <li><strong>Currency:</strong> Vietnamese Dong (VND)</li>
+                <li><strong>Analysis Date:</strong> {{ portfolio.created_at.strftime('%Y-%m-%d %H:%M') if portfolio.created_at else 'N/A' }}</li>
+                <li><strong>Chart Interactions:</strong> Zoom, pan, hover for details, export options</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>

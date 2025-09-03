@@ -2,6 +2,7 @@
 # Note: This file is kept for backward compatibility
 # Primary dependency management is now in pyproject.toml
 flask>=3.0.3
+flask-cors>=6.0.1
 vnstock>=3.2.6
 quantstats>=0.0.69
 pandas>=2.2.2
@@ -9,3 +10,6 @@ numpy>=1.26.4,<2.0.0
 tenacity>=8.2.3
 gunicorn>=23.0.0
 python-dotenv>=1.0.0
+plotly>=5.17.0
+kaleido>=0.2.1
+matplotlib>=3.10.1
