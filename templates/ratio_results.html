@@ -1,0 +1,186 @@
+<!-- templates/ratio_results.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Ratios Results - Vietnam Stock Analyzer</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .ratio-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        .ratio-table th, .ratio-table td {
+            padding: 0.5rem;
+            text-align: right;
+            border: 1px solid #ddd;
+        }
+        .ratio-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            text-align: left;
+        }
+        .ratio-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .metric-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="qs-container">
+        <!-- Navigation -->
+        <nav class="qs-nav qs-mb-4">
+            <div class="qs-nav-links">
+                <a href="/" class="qs-nav-link">Portfolio Analysis</a>
+                <a href="/ratios" class="qs-nav-link">Financial Ratios</a>
+            </div>
+        </nav>
+
+        <h1 class="qs-mb-4">Financial Ratios Results</h1>
+
+        <!-- Summary Info -->
+        <div class="qs-row qs-mb-4">
+            <div class="qs-col">
+                <strong>Symbols:</strong> {{ symbols|join(', ') }}
+            </div>
+            <div class="qs-col">
+                <strong>Period:</strong> {{ period.title() }}
+            </div>
+        </div>
+
+        {% if summary_data %}
+        <!-- Key Valuation Metrics -->
+        <h2>Key Valuation Metrics</h2>
+        <div class="metrics-grid">
+            {% for stock in summary_data %}
+            <div class="metric-card">
+                <div style="font-weight: bold; margin-bottom: 0.5rem;">{{ stock.symbol }}</div>
+                
+                {% if stock.pe_ratio %}
+                <div class="metric-value">{{ "%.2f"|format(stock.pe_ratio) }}</div>
+                <div class="metric-label">P/E Ratio</div>
+                {% endif %}
+                
+                {% if stock.pb_ratio %}
+                <div class="metric-value">{{ "%.2f"|format(stock.pb_ratio) }}</div>
+                <div class="metric-label">P/B Ratio</div>
+                {% endif %}
+                
+                {% if stock.roe %}
+                <div class="metric-value">{{ "%.1f"|format(stock.roe * 100) }}%</div>
+                <div class="metric-label">ROE</div>
+                {% endif %}
+                
+                {% if stock.roa %}
+                <div class="metric-value">{{ "%.1f"|format(stock.roa * 100) }}%</div>
+                <div class="metric-label">ROA</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Financial Ratios Tables -->
+        {% if ratio_data %}
+        {% for symbol, data in ratio_data.items() %}
+        <h2>{{ symbol }} - Financial Ratios</h2>
+        
+        <div class="table-container">
+            <table class="ratio-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        {% for index in data.index %}
+                        <th>{{ index }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for column in data.columns[:20] %}  <!-- Limit to first 20 metrics for readability -->
+                    <tr>
+                        <td><strong>{{ column }}</strong></td>
+                        {% for index in data.index %}
+                        <td>
+                            {% set value = data.loc[index, column] %}
+                            {% if value is not none and value != 'nan' %}
+                                {% if value is number %}
+                                    {{ "%.2f"|format(value) }}
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if data.columns|length > 20 %}
+        <p class="qs-text-muted">Showing first 20 metrics. Export to Excel to see all {{ data.columns|length }} metrics.</p>
+        {% endif %}
+        
+        {% endfor %}
+        {% endif %}
+
+        <!-- Export Options -->
+        <div class="qs-mt-4">
+            <a href="/ratios" class="button">← Back to Analysis</a>
+            
+            {% if symbols %}
+            <form method="post" action="/ratios/analyze" style="display: inline;">
+                <input type="hidden" name="symbols" value="{{ symbols|join(', ') }}">
+                <input type="hidden" name="period" value="{{ period }}">
+                <input type="hidden" name="export_format" value="excel">
+                <button type="submit" class="button secondary">Export to Excel</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Data Information -->
+        <div class="qs-info-section qs-mt-5">
+            <h3>Data Information</h3>
+            <ul>
+                <li><strong>Source:</strong> vnstock API</li>
+                <li><strong>Period:</strong> {{ period.title() }} financial data</li>
+                <li><strong>Last Updated:</strong> {{ moment().format('YYYY-MM-DD HH:mm') if moment else 'N/A' }}</li>
+                <li><strong>Currency:</strong> VND (Vietnamese Dong)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>

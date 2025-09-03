@@ -4,6 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Common Commands
 
+### Ground Rules
+- **Imports placement**: Always place imports on top of the file. 
 ### Development
 - **Run locally**: `python app.py` (starts Flask dev server on port 5000)
 - **Run tests**: `pytest tests/test_app.py` (runs all tests)

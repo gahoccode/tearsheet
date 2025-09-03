@@ -114,3 +114,33 @@ h1 {
     color: #1a237e;
     font-weight: 700;
 }
+
+/* Navigation Tabs */
+.navigation-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.nav-tab {
+    padding: 12px 24px;
+    text-decoration: none;
+    color: #666;
+    border: 1px solid transparent;
+    border-radius: 6px 6px 0 0;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.nav-tab:hover {
+    color: #1a237e;
+    background: #f5f6fa;
+}
+
+.nav-tab.active {
+    color: #1a237e;
+    background: #fff;
+    border-color: #e0e0e0 #e0e0e0 #fff;
+    font-weight: 600;
+}

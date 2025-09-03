@@ -10,6 +10,10 @@
 <body>
     <div class="qs-container">
         <h1 class="qs-mb-4">Vietnam Stock Portfolio Analyzer</h1>
+        <div class="navigation-tabs qs-mb-4">
+            <a href="/" class="nav-tab active">Portfolio Analysis</a>
+            <a href="/ratios" class="nav-tab">Financial Ratios</a>
+        </div>
         {% with messages = get_flashed_messages() %}
         {% if messages %}
             <div class="qs-alert qs-alert-danger" role="alert">

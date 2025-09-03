@@ -9,11 +9,16 @@ import pandas as pd
 from vnstock import Quote
 import logging
 
+
 class DataLoaderError(Exception):
     """Custom exception for data loader errors."""
+
     pass
 
-def fetch_historical_data(symbols: List[str], start_date: str, end_date: str, interval: str = '1D') -> pd.DataFrame:
+
+def fetch_historical_data(
+    symbols: List[str], start_date: str, end_date: str, interval: str = "1D"
+) -> pd.DataFrame:
     """
     Fetch and merge historical price data for multiple symbols using vnstock.
 
@@ -36,7 +41,9 @@ def fetch_historical_data(symbols: List[str], start_date: str, end_date: str, in
     for symbol in symbols:
         try:
             quote = Quote(symbol=symbol)
-            data = quote.history(start=start_date, end=end_date, interval=interval, to_df=True)
+            data = quote.history(
+                start=start_date, end=end_date, interval=interval, to_df=True
+            )
             if not data.empty:
                 all_historical_data[symbol] = data
             else:
@@ -50,14 +57,15 @@ def fetch_historical_data(symbols: List[str], start_date: str, end_date: str, in
     for symbol, data in all_historical_data.items():
         temp_df = data.copy()
         for col in temp_df.columns:
-            if col != 'time':
+            if col != "time":
                 temp_df.rename(columns={col: f"{symbol}_{col}"}, inplace=True)
         if combined_data.empty:
             combined_data = temp_df
         else:
-            combined_data = pd.merge(combined_data, temp_df, on='time', how='outer')
-    combined_data = combined_data.sort_values('time').reset_index(drop=True)
+            combined_data = pd.merge(combined_data, temp_df, on="time", how="outer")
+    combined_data = combined_data.sort_values("time").reset_index(drop=True)
     return combined_data
+
 
 def get_close_prices(combined_data: pd.DataFrame, symbols: List[str]) -> pd.DataFrame:
     """
@@ -73,7 +81,7 @@ def get_close_prices(combined_data: pd.DataFrame, symbols: List[str]) -> pd.Data
     Example:
         >>> get_close_prices(combined_data, ['REE', 'FMC'])
     """
-    close_cols = ['time'] + [f"{symbol}_close" for symbol in symbols]
+    close_cols = ["time"] + [f"{symbol}_close" for symbol in symbols]
     missing_cols = [col for col in close_cols if col not in combined_data.columns]
     if missing_cols:
         raise DataLoaderError(f"Missing columns in combined data: {missing_cols}")
