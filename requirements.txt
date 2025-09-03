@@ -1,13 +1,11 @@
-# Project dependencies for QuantstatsWebApp
-flask==3.0.3
-vnstock==3.2.6
-quantstats==0.0.69
-pandas==2.2.2
-numpy==1.26.4
-bootstrap-flask==2.3.3
-tenacity==8.2.3
-pytest==8.1.1
-ipython==8.24.0
-gunicorn
-python-dotenv==1.1.1
-dotenv==0.9.9
+# Project dependencies for tearsheet
+# Note: This file is kept for backward compatibility
+# Primary dependency management is now in pyproject.toml
+flask>=3.0.3
+vnstock>=3.2.6
+quantstats>=0.0.69
+pandas>=2.2.2
+numpy>=1.26.4,<2.0.0
+tenacity>=8.2.3
+gunicorn>=23.0.0
+python-dotenv>=1.0.0
