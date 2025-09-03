@@ -5,7 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Common Commands
 
 ### Ground Rules
-- **Imports placement**: Always place imports on top of the file. 
+- **Imports placement**: Always place imports on top of the file.
+- **Code formatting and linting**: Use `uv run ruff format` for code formatting and `uv run ruff check --fix` for fixing linting errors automatically. 
 ### Development
 - **Run locally**: `python app.py` (starts Flask dev server on port 5000)
 - **Run tests**: `pytest tests/test_app.py` (runs all tests)

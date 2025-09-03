@@ -8,7 +8,6 @@ from app import app
 import matplotlib
 
 
-
 class FlaskAppIntegrationTest(unittest.TestCase):
     def test_matplotlib_backend_is_agg(self):
         """Test that matplotlib backend is set to 'Agg' for server-side rendering."""

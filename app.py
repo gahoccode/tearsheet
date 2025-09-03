@@ -183,34 +183,34 @@ def analyze_ratios():
         symbols_input = request.form.get("symbols", "")
         period = request.form.get("period", "year")
         export_format = request.form.get("export_format", "table")
-        
+
         # Parse comma-separated symbols
         if not symbols_input.strip():
             flash("At least one symbol is required.")
             return render_template("ratios.html"), 200
-            
+
         symbols = [s.strip().upper() for s in symbols_input.split(",") if s.strip()]
-        
+
         # Clean and validate symbols
         try:
             validated_symbols = validation_service.validate_symbols(symbols)
         except ValidationError as e:
             flash(str(e))
             return render_template("ratios.html"), 200
-        
+
         # Fetch financial ratios using VnstockService
         try:
             ratio_data = vnstock_service.fetch_multiple_ratios(
                 validated_symbols, period=period
             )
-            
+
             if not ratio_data:
                 flash("No financial ratio data available for the selected symbols.")
                 return render_template("ratios.html"), 200
-                
+
             # Create fundamental summary
             summary_data = vnstock_service.get_fundamental_summary(validated_symbols)
-            
+
             # Handle export request
             if export_format == "excel":
                 try:
@@ -220,21 +220,23 @@ def analyze_ratios():
                     flash(f"Financial ratios exported to {output_path}")
                 except Exception as e:
                     flash(f"Export failed: {str(e)}")
-            
+
             # Render results page with ratio data
             return render_template(
                 "ratio_results.html",
                 ratio_data=ratio_data,
-                summary_data=summary_data.to_dict('records') if not summary_data.empty else [],
+                summary_data=summary_data.to_dict("records")
+                if not summary_data.empty
+                else [],
                 symbols=validated_symbols,
                 period=period,
-                export_format=export_format
+                export_format=export_format,
             )
-            
+
         except DataFetchError as e:
             flash(f"Error fetching ratio data: {str(e)}")
             return render_template("ratios.html"), 200
-            
+
     except Exception as e:
         flash(f"Unexpected error: {str(e)}")
         return render_template("ratios.html"), 200
@@ -245,33 +247,33 @@ def api_get_ratios(symbol):
     """API endpoint to get financial ratios for a single symbol."""
     try:
         period = request.args.get("period", "year")
-        
+
         # Validate symbol
         try:
             validated_symbols = validation_service.validate_symbols([symbol])
             symbol = validated_symbols[0]
         except ValidationError as e:
             return {"error": str(e)}, 400
-            
+
         # Fetch ratio data
         try:
             ratios = vnstock_service.fetch_financial_ratios(symbol, period=period)
-            
+
             if ratios.empty:
                 return {"error": "No ratio data available"}, 404
-                
+
             # Convert to JSON-serializable format
             return {
                 "symbol": symbol,
                 "period": period,
                 "data": ratios.to_dict("records"),
                 "columns": list(ratios.columns),
-                "rows": len(ratios)
+                "rows": len(ratios),
             }
-            
+
         except DataFetchError as e:
             return {"error": str(e)}, 500
-            
+
     except Exception as e:
         return {"error": f"Unexpected error: {str(e)}"}, 500
 
