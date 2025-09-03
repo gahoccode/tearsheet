@@ -3,7 +3,7 @@ Portfolio data models and structures.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional
 import pandas as pd
 from datetime import datetime
 
@@ -59,6 +59,8 @@ class Portfolio:
             raise ValidationError("Portfolio weights must sum to 1.0")
 
         # Validate date format
+        from datetime import datetime
+
         try:
             start_dt = datetime.strptime(self.start_date, "%Y-%m-%d")
             end_dt = datetime.strptime(self.end_date, "%Y-%m-%d")
@@ -86,7 +88,7 @@ class Portfolio:
         """Get capital allocation per stock."""
         return {stock.symbol: stock.weight * self.capital for stock in self.stocks}
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict:
         """Convert portfolio to dictionary."""
         return {
             "name": self.name,
@@ -174,7 +176,7 @@ class PortfolioAnalysis:
     individual_returns: Optional[pd.DataFrame] = None
     analysis_timestamp: datetime = field(default_factory=datetime.now)
 
-    def get_summary_stats(self) -> Dict[str, Any]:
+    def get_summary_stats(self) -> Dict[str, any]:
         """Get summary statistics."""
         return {
             "portfolio": self.portfolio.to_dict(),
@@ -188,7 +190,7 @@ class PortfolioAnalysis:
             "analysis_timestamp": self.analysis_timestamp.isoformat(),
         }
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict:
         """Convert analysis to dictionary for JSON serialization."""
         return {
             **self.get_summary_stats(),
