@@ -50,6 +50,34 @@ tearsheet/
 - uv (Python package manager)
 - npm or yarn
 
+### Quick Start
+
+1. **Clone and setup environment files**:
+```bash
+# Backend environment
+cd backend
+cp .env.example .env
+# Edit .env and generate SECRET_KEY: python -c "import secrets; print(secrets.token_hex(32))"
+
+# Frontend environment  
+cd ../frontend
+cp .env.example .env.local
+# Edit .env.local if needed (defaults should work for development)
+```
+
+2. **Install dependencies and start servers**:
+```bash
+# Terminal 1 - Backend
+cd backend && uv pip install --all --upgrade --refresh && PORT=5001 uv run python api.py
+
+# Terminal 2 - Frontend  
+cd frontend && npm install && npm run dev
+```
+
+3. **Access the application**:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5001
+
 ### Backend Setup
 
 1. **Navigate to backend directory**:
@@ -63,11 +91,15 @@ uv pip install --all --upgrade --refresh
 ```
 
 3. **Set environment variables**:
-Create `.env` file in backend directory:
 ```bash
-SECRET_KEY=your-secret-key-here
-PORT=5001
+# Copy example environment file and configure
+cp .env.example .env
 ```
+
+Then edit `.env` file and update the values:
+- Generate a secure `SECRET_KEY` using: `python -c "import secrets; print(secrets.token_hex(32))"`
+- Verify `PORT=5001` (recommended to avoid macOS AirPlay conflicts)
+- Set appropriate Flask environment settings
 
 4. **Start Flask API**:
 ```bash
@@ -89,11 +121,15 @@ npm install
 ```
 
 3. **Set environment variables**:
-Create `.env.local` file in frontend directory:
 ```bash
-NEXT_PUBLIC_API_URL=http://localhost:5001
-NODE_ENV=development
+# Copy example environment file and configure
+cp .env.example .env.local
 ```
+
+Then edit `.env.local` file and update the values:
+- Verify `NEXT_PUBLIC_API_URL=http://localhost:5001` matches backend port
+- Adjust timeout and theme settings as needed
+- All variables starting with `NEXT_PUBLIC_` are accessible in client-side code
 
 4. **Start Next.js development server**:
 ```bash
@@ -107,6 +143,60 @@ Frontend will be available at http://localhost:3000
 Run both servers simultaneously:
 - **Terminal 1**: `cd backend && PORT=5001 uv run python api.py`
 - **Terminal 2**: `cd frontend && npm run dev`
+
+## Environment Configuration
+
+### Production Environment Variables
+
+#### Backend Production (`.env`)
+```bash
+# Production Flask settings
+SECRET_KEY=your-production-secret-key-32-characters-minimum
+PORT=5000
+FLASK_ENV=production
+FLASK_DEBUG=false
+
+# Optional: Database settings (if using database)
+# DATABASE_URL=postgresql://user:password@host:port/database
+
+# Optional: Monitoring and logging
+# LOG_LEVEL=INFO
+# SENTRY_DSN=your-sentry-dsn-here
+```
+
+#### Frontend Production (`.env.production` or deployment platform)
+```bash
+# Production API URL
+NEXT_PUBLIC_API_URL=https://your-backend-domain.com
+
+# Next.js optimizations
+NODE_ENV=production
+
+# Optional: Analytics and monitoring
+# NEXT_PUBLIC_ANALYTICS_ID=your-analytics-id
+# NEXT_PUBLIC_SENTRY_DSN=your-sentry-dsn
+```
+
+### Environment File Security
+
+**Important Security Notes:**
+- ⚠️ **Never commit `.env` files to version control**
+- ✅ Add `.env*` to `.gitignore` file
+- ✅ Use different SECRET_KEY values for development and production
+- ✅ Generate secure random strings for SECRET_KEY (minimum 32 characters)
+- ✅ Use environment variables in deployment platforms (Vercel, Railway, etc.)
+
+**Generate Secure SECRET_KEY:**
+```python
+# Python method to generate secure key
+import secrets
+print(secrets.token_hex(32))
+```
+
+```bash
+# Or use openssl
+openssl rand -hex 32
+```
 
 Access the application at http://localhost:3000
 
