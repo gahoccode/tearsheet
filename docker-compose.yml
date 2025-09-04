@@ -1,14 +1,61 @@
-version: '3.8'
+version: '3.10'
+
 services:
-  quantstatswebapp:
-    build: .
-    container_name: quantstatswebapp
+  # Flask Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tearsheet-backend
     ports:
-      - "5001:5000"
+      - "5001:5001"
     environment:
-      #- SECRET_KEY=${SECRET_KEY}
-      #- FLASK_ENV=${FLASK_ENV:-production}
-      - .env
+      - PORT=5001
+      - FLASK_ENV=production
+    env_file:
+      - ./backend/.env
     volumes:
-      - .:/app
+      - backend_reports:/app/static/reports
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5001/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
+    networks:
+      - tearsheet-network
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: tearsheet-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://backend:5001
+    env_file:
+      - ./frontend/.env.local
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - tearsheet-network
+
+volumes:
+  backend_reports:
+    driver: local
+
+networks:
+  tearsheet-network:
+    driver: bridge

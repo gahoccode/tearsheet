@@ -198,6 +198,123 @@ print(secrets.token_hex(32))
 openssl rand -hex 32
 ```
 
+## Docker Deployment
+
+### Prerequisites
+- Docker >= 20.10
+- Docker Compose >= 2.0
+
+### Quick Docker Setup
+
+1. **Setup environment files**:
+```bash
+# Backend environment
+cd backend && cp .env.example .env
+# Edit .env and generate SECRET_KEY: python -c "import secrets; print(secrets.token_hex(32))"
+
+# Frontend environment  
+cd ../frontend && cp .env.example .env.local
+# Edit .env.local if needed (defaults work for Docker)
+```
+
+2. **Build and run with Docker Compose**:
+```bash
+# Production deployment
+docker-compose up --build -d
+
+# Development deployment with hot reloading
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+```
+
+3. **Access the application**:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5001
+
+### Docker Commands
+
+#### Production Deployment
+```bash
+# Build and start all services
+docker-compose up --build -d
+
+# View service status
+docker-compose ps
+
+# View logs (all services)
+docker-compose logs -f
+
+# View logs (specific service)
+docker-compose logs -f backend
+docker-compose logs -f frontend
+
+# Stop all services
+docker-compose down
+
+# Stop and remove volumes
+docker-compose down -v
+
+# Rebuild from scratch
+docker-compose down && docker-compose up --build --force-recreate
+```
+
+#### Development Deployment
+```bash
+# Start with hot reloading
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
+# Development with specific service rebuild
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build backend
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build frontend
+```
+
+#### Build Management
+```bash
+# Build specific service
+docker-compose build backend
+docker-compose build frontend
+
+# Build with no cache
+docker-compose build --no-cache
+
+# Pull latest base images
+docker-compose pull
+
+# Remove unused images and containers
+docker system prune -a
+```
+
+### Individual Service Builds
+
+```bash
+# Backend only
+docker build -t tearsheet-backend ./backend
+docker run -p 5001:5001 --env-file ./backend/.env tearsheet-backend
+
+# Frontend only  
+docker build -t tearsheet-frontend ./frontend
+docker run -p 3000:3000 --env-file ./frontend/.env.local tearsheet-frontend
+```
+
+### Container Architecture
+
+The application uses a **microservices container architecture**:
+
+- **Backend Container**: Python 3.10-slim with Flask API (Port 5001)
+  - Multi-stage build for optimization
+  - Non-root user (appuser) for security
+  - Health checks and proper signal handling
+  - Volume for persistent report storage
+
+- **Frontend Container**: Node.js 20-alpine with Next.js standalone build (Port 3000)  
+  - Multi-stage build with production optimization
+  - Non-root user (nextjs) for security
+  - Standalone build for minimal runtime footprint
+  - Health checks and telemetry disabled
+
+- **Service Communication**: Internal Docker network for secure inter-service communication
+- **Persistent Storage**: Named volumes for generated reports and temporary files
+- **Environment Management**: Separate .env files for each service
+
 Access the application at http://localhost:3000
 
 ## API Endpoints
@@ -295,11 +412,24 @@ NODE_ENV=production
 
 ### GitHub Container Registry (GHCR)
 
-Automated builds available at `ghcr.io/{username}/quantstatswebapp:latest`:
+Automated builds available for both microservices:
 
 ```bash
-docker pull ghcr.io/{your-username}/quantstatswebapp:latest
-docker run -p 5000:5000 -e PORT=5000 ghcr.io/{your-username}/quantstatswebapp:latest
+# Pull both services
+docker pull ghcr.io/gahoccode/tearsheet-backend:latest
+docker pull ghcr.io/gahoccode/tearsheet-frontend:latest
+
+# Run backend service
+docker run -p 5001:5001 --env-file ./backend/.env ghcr.io/gahoccode/tearsheet-backend:latest
+
+# Run frontend service  
+docker run -p 3000:3000 --env-file ./frontend/.env.local ghcr.io/gahoccode/tearsheet-frontend:latest
+```
+
+**Or use Docker Compose with registry images:**
+```bash
+# Create docker-compose.prod.yml with registry images
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ## License

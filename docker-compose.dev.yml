@@ -1,0 +1,29 @@
+# Development Docker Compose Override
+# Use: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: '3.10'
+
+services:
+  backend:
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=true
+      - PORT=5001
+    volumes:
+      # Mount source code for hot reloading
+      - ./backend:/app
+      - /app/__pycache__
+    command: ["python", "api.py"]
+
+  frontend:
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:5001
+    volumes:
+      # Mount source code for hot reloading
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    command: ["npm", "run", "dev"]
+    ports:
+      - "3000:3000"
