@@ -232,4 +232,71 @@ NEXT_PUBLIC_API_TIMEOUT=30000
 - **Table component types**: Use `React.HTMLAttributes<HTMLTableCellElement>` for TableHead, not `React.ThHTMLAttributes` (which doesn't exist)
 - **Select component**: Use standard `React.SelectHTMLAttributes<HTMLSelectElement>` interface
 - **Component refs**: Always use proper HTML element types for forwardRef components
+
+## Troubleshooting Guide
+
+### Frontend Server Won't Start
+
+#### Symptoms
+- `npm run dev` appears to start but frontend is not accessible on port 3000
+- Connection timeout errors when accessing http://localhost:3000
+- Server process appears to run but no actual HTTP service
+
+#### Investigation Process
+1. **Check for existing processes**: `lsof -ti:3000` to see if port is already in use
+2. **Run with verbose output**: Use debug flags to see actual error output instead of assuming server is up
+3. **Check configuration files**: Verify all config files are properly formatted
+4. **Test direct Next.js**: Try `npx next dev --port 3000` to bypass npm scripts
+
+#### Root Cause Discovery (TailwindCSS v4.0 Configuration Conflicts)
+- **Problem**: Mixed TailwindCSS v3 and v4 configurations causing CSS compilation failures
+- **Evidence**: CSS compilation errors prevent server from fully starting
+- **Files involved**: `tailwind.config.ts` (deprecated) vs `globals.css` (@theme directive)
+
+#### Resolution Steps
+1. **Remove deprecated config**: Delete `tailwind.config.ts` file completely
+2. **Update PostCSS**: Ensure `postcss.config.mjs` uses `@tailwindcss/postcss`
+3. **Fix globals.css**: Use proper `@theme` directive with CSS variables
+4. **Test compilation**: Verify CSS compiles without errors
+
+### shadcn/ui Installation Issues
+
+#### Symptoms
+- `npx shadcn-ui@latest init` fails or hangs
+- CLI can't find configuration files
+- Component installation commands don't work
+
+#### Root Cause
+- shadcn/ui CLI expects JavaScript configuration file (`tailwind.config.js`)
+- TailwindCSS v4.0 uses CSS-first configuration without JavaScript config
+- CLI incompatibility with modern TailwindCSS approach
+
+#### Workaround Process
+1. **Manual dependency installation**: Install required packages manually
+   ```bash
+   npm install @radix-ui/react-label @radix-ui/react-slot class-variance-authority next-themes lucide-react
+   ```
+2. **Create utils manually**: Set up `src/lib/utils.ts` with cn() function
+3. **Copy component code**: Manually create components in `src/components/ui/`
+4. **Adapt for project**: Modify components to work with TailwindCSS v4.0
+
+### TypeScript Compilation Errors
+
+#### Debugging TypeScript Errors
+1. **Use TypeScript compiler directly**: `npx tsc --noEmit` to see all errors
+2. **Check component by component**: Isolate errors to specific files
+3. **Verify React types**: Ensure using correct React DOM element types
+4. **Test in isolation**: Create minimal component to test type definitions
+
+### Key Learning: Always Check Latest Documentation
+- **Critical moment**: When facing configuration issues, always research latest version practices
+- **Discovery**: TailwindCSS v4.0 eliminated JavaScript config files entirely
+- **Lesson**: Don't assume compatibility - verify CLI tool compatibility with your stack
+
+### Debugging Methodology That Worked
+1. **Question assumptions**: Don't assume server is running just because command appears to execute
+2. **Use verbose output**: Always check actual error output when troubleshooting
+3. **Systematic investigation**: Check each layer - configuration, dependencies, compilation
+4. **Research current practices**: Use Context7 to get latest documentation when stuck
+5. **Test incrementally**: Make one change at a time to isolate issues
 - **Built-in Features**: Container queries, nesting, and modern CSS features included by default
