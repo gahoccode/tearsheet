@@ -1,0 +1,23 @@
+warning: `VIRTUAL_ENV=/Users/tamle/Projects/tearsheet/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+2025-09-04 10:28:13,463 - src.utils.helpers - INFO - Logging configured at INFO level
+ * Serving Flask app 'api'
+ * Debug mode: on
+2025-09-04 10:28:13,486 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.4:5001
+2025-09-04 10:28:13,486 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-04 10:28:13,487 - werkzeug - INFO -  * Restarting with stat
+2025-09-04 10:28:15,291 - src.utils.helpers - INFO - Logging configured at INFO level
+2025-09-04 10:28:15,304 - werkzeug - WARNING -  * Debugger is active!
+2025-09-04 10:28:15,312 - werkzeug - INFO -  * Debugger PIN: 774-571-958
+2025-09-04 10:28:23,227 - werkzeug - INFO - 127.0.0.1 - - [04/Sep/2025 10:28:23] "GET /api/health HTTP/1.1" 200 -
+2025-09-04 10:28:31,234 - werkzeug - INFO - 127.0.0.1 - - [04/Sep/2025 10:28:31] "OPTIONS /api/tearsheet HTTP/1.1" 200 -
+2025-09-04 10:28:31,236 - src.services.validation_service - INFO - Validating portfolio form data
+2025-09-04 10:28:31,237 - src.services.validation_service - INFO - Portfolio form validation successful: 3 stocks
+2025-09-04 10:28:31,237 - src.core.data_fetcher - INFO - Fetching historical data for 3 symbols: ['REE', 'FMC', 'DHC']
+2025-09-04 10:28:31,237 - src.core.data_fetcher - INFO - Period: 2024-01-01 to 2024-06-30, interval: 1D
+2025-09-04 10:28:31,975 - src.core.data_fetcher - INFO - Successfully fetched data for 3 symbols
+2025-09-04 10:28:31,976 - src.core.portfolio_analyzer - INFO - Calculating portfolio returns
+2025-09-04 10:28:31,978 - src.core.portfolio_analyzer - INFO - Portfolio returns calculated: 119 periods
+2025-09-04 10:28:32,884 - werkzeug - INFO - 127.0.0.1 - - [04/Sep/2025 10:28:32] "POST /api/tearsheet HTTP/1.1" 200 -

@@ -307,8 +307,6 @@ class VnstockService:
         try:
             logger.info(f"Getting stock overview for {symbol}")
 
-            stock = self.get_stock_instance(symbol)
-
             # Get financial ratios
             ratios = self.fetch_financial_ratios(symbol)
 

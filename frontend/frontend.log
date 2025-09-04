@@ -1,0 +1,15 @@
+
+> frontend@1.0.0 dev
+> next dev --turbopack --port 3000
+
+   ▲ Next.js 15.5.2 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.4:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 956ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.3s
+ GET / 200 in 2636ms
+ GET / 200 in 73ms

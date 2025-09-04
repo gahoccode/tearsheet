@@ -105,15 +105,19 @@ def analyze():
 
         # Calculate performance metrics
         try:
-            metrics = portfolio_analyzer.calculate_performance_metrics(portfolio_returns)
+            metrics = portfolio_analyzer.calculate_performance_metrics(
+                portfolio_returns
+            )
         except AnalysisError as e:
             flash(f"Error calculating metrics: {str(e)}")
             return render_template("index.html"), 200
 
         # Generate interactive Plotly charts
         try:
-            performance_chart = visualization_service.create_portfolio_performance_chart(
-                portfolio_returns, "Portfolio Performance Over Time"
+            performance_chart = (
+                visualization_service.create_portfolio_performance_chart(
+                    portfolio_returns, "Portfolio Performance Over Time"
+                )
             )
             drawdown_chart = visualization_service.create_drawdown_chart(
                 portfolio_returns, "Portfolio Drawdown Analysis"
@@ -121,11 +125,15 @@ def analyze():
             monthly_heatmap = visualization_service.create_monthly_returns_heatmap(
                 portfolio_returns, "Monthly Returns Heatmap"
             )
-            metrics_dashboard = visualization_service.create_performance_metrics_dashboard(
-                metrics, "Performance Metrics Dashboard"
+            metrics_dashboard = (
+                visualization_service.create_performance_metrics_dashboard(
+                    metrics, "Performance Metrics Dashboard"
+                )
             )
-            composition_chart = visualization_service.create_portfolio_composition_chart(
-                portfolio.symbols, portfolio.weights, "Portfolio Composition"
+            composition_chart = (
+                visualization_service.create_portfolio_composition_chart(
+                    portfolio.symbols, portfolio.weights, "Portfolio Composition"
+                )
             )
         except AnalysisError as e:
             flash(f"Error generating charts: {str(e)}")
@@ -141,7 +149,7 @@ def analyze():
             monthly_heatmap=monthly_heatmap,
             metrics_dashboard=metrics_dashboard,
             composition_chart=composition_chart,
-            returns_data=portfolio_returns
+            returns_data=portfolio_returns,
         )
     except (ValidationError, DataFetchError, AnalysisError) as e:
         flash(f"Error: {str(e)}")

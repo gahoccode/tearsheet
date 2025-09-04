@@ -115,9 +115,11 @@ def generate_tearsheet():
         # Generate QuantStats HTML tearsheet
         try:
             # Create a temporary file to store the HTML
-            with tempfile.NamedTemporaryFile(mode='w+', suffix='.html', delete=False) as temp_file:
+            with tempfile.NamedTemporaryFile(
+                mode="w+", suffix=".html", delete=False
+            ) as temp_file:
                 temp_file_path = temp_file.name
-            
+
             # Generate the HTML tearsheet
             qs.reports.html(
                 portfolio_returns,
@@ -128,27 +130,29 @@ def generate_tearsheet():
                 output=temp_file_path,
                 compounded=True,
                 periods_per_year=252,
-                download_filename='tearsheet.html',
-                figfmt='svg',
+                download_filename="tearsheet.html",
+                figfmt="svg",
                 template_path=None,
-                match_dates=True
+                match_dates=True,
             )
-            
+
             # Read the generated HTML content
-            with open(temp_file_path, 'r', encoding='utf-8') as f:
+            with open(temp_file_path, "r", encoding="utf-8") as f:
                 html_content = f.read()
-            
+
             # Clean up the temporary file
             os.unlink(temp_file_path)
-            
+
             # Return the HTML content
-            return jsonify({
-                "html": html_content,
-                "portfolio_name": portfolio_name,
-                "symbols": portfolio.symbols,
-                "period": f"{portfolio.start_date} to {portfolio.end_date}",
-                "data_points": len(portfolio_returns)
-            })
+            return jsonify(
+                {
+                    "html": html_content,
+                    "portfolio_name": portfolio_name,
+                    "symbols": portfolio.symbols,
+                    "period": f"{portfolio.start_date} to {portfolio.end_date}",
+                    "data_points": len(portfolio_returns),
+                }
+            )
 
         except Exception as e:
             return jsonify({"error": f"Error generating tearsheet: {str(e)}"}), 500
@@ -220,41 +224,22 @@ def analyze():
 
         # Calculate performance metrics
         try:
-            metrics = portfolio_analyzer.calculate_performance_metrics(portfolio_returns)
+            metrics = portfolio_analyzer.calculate_performance_metrics(
+                portfolio_returns
+            )
         except AnalysisError as e:
             return jsonify({"error": f"Error calculating metrics: {str(e)}"}), 500
-
-        # Generate Plotly chart data
-        try:
-            performance_chart = chart_data_service.create_portfolio_performance_data(
-                portfolio_returns, title="Portfolio Performance Over Time"
-            )
-            drawdown_chart = chart_data_service.create_drawdown_data(
-                portfolio_returns, title="Portfolio Drawdown Analysis"
-            )
-            composition_chart = chart_data_service.create_composition_data(
-                portfolio.symbols, portfolio.weights, title="Portfolio Composition"
-            )
-            metrics_dashboard = chart_data_service.create_metrics_dashboard_data(
-                metrics, title="Performance Metrics Dashboard"
-            )
-        except AnalysisError as e:
-            return jsonify({"error": f"Error creating chart data: {str(e)}"}), 500
 
         # Prepare response data
         response_data = {
             "portfolio": portfolio.to_dict(),
             "metrics": metrics,
             "returns": {
-                "data": {date.isoformat(): value for date, value in portfolio_returns.items()},
+                "data": {
+                    date.isoformat(): value for date, value in portfolio_returns.items()
+                },
                 "dates": [date.isoformat() for date in portfolio_returns.index],
                 "values": portfolio_returns.tolist(),
-            },
-            "charts": {
-                "performance": performance_chart,
-                "drawdown": drawdown_chart,
-                "composition": composition_chart,
-                "metrics_dashboard": metrics_dashboard,
             },
             "analysis_summary": {
                 "data_points": len(portfolio_returns),
@@ -309,7 +294,11 @@ def analyze_ratios():
             )
 
             if not ratio_data:
-                return jsonify({"error": "No financial ratio data available for the selected symbols"}), 404
+                return jsonify(
+                    {
+                        "error": "No financial ratio data available for the selected symbols"
+                    }
+                ), 404
 
             # Create fundamental summary
             summary_data = vnstock_service.get_fundamental_summary(validated_symbols)
@@ -319,7 +308,9 @@ def analyze_ratios():
                 "symbols": validated_symbols,
                 "period": period,
                 "ratio_data": {},
-                "summary_data": summary_data.to_dict("records") if not summary_data.empty else [],
+                "summary_data": summary_data.to_dict("records")
+                if not summary_data.empty
+                else [],
             }
 
             # Convert each DataFrame to records format
@@ -360,13 +351,15 @@ def api_get_ratios(symbol):
                 return jsonify({"error": "No ratio data available"}), 404
 
             # Convert to JSON-serializable format
-            return jsonify({
-                "symbol": symbol,
-                "period": period,
-                "data": ratios.to_dict("records"),
-                "columns": list(ratios.columns),
-                "rows": len(ratios),
-            })
+            return jsonify(
+                {
+                    "symbol": symbol,
+                    "period": period,
+                    "data": ratios.to_dict("records"),
+                    "columns": list(ratios.columns),
+                    "rows": len(ratios),
+                }
+            )
 
         except DataFetchError as e:
             return jsonify({"error": str(e)}), 500
@@ -393,15 +386,9 @@ def validate_input():
             validated_data = validation_service.validate_portfolio_form(
                 symbols, [str(w) for w in weights], str(capital), start_date, end_date
             )
-            return jsonify({
-                "valid": True,
-                "validated_data": validated_data
-            })
+            return jsonify({"valid": True, "validated_data": validated_data})
         except ValidationError as e:
-            return jsonify({
-                "valid": False,
-                "error": str(e)
-            }), 400
+            return jsonify({"valid": False, "error": str(e)}), 400
 
     except Exception as e:
         return jsonify({"error": f"Validation error: {str(e)}"}), 500
