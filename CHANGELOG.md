@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2025-01-04
+### Changed
+- **Visualization Approach**: Replaced complex Plotly.js charts with simple QuantStats HTML tearsheet rendering
+- **Frontend Simplification**: Simplified React components to display QuantStats-generated HTML reports using dangerouslySetInnerHTML
+- **Backend API**: Added new `/api/tearsheet` endpoint that generates complete HTML tearsheets using `qs.reports.html()`
+- **Component Architecture**: Created streamlined `QuantStatsTearsheet` component for HTML display
+
+### Removed
+- **Plotly.js Dependencies**: Removed plotly.js and react-plotly.js packages from frontend
+- **Custom Chart Components**: Eliminated DynamicPlotlyChart and PlotlyChart components
+- **Chart Data Services**: Removed ChartDataService and related chart data processing
+- **Complex Visualizations**: Simplified from custom interactive charts to proven QuantStats tearsheets
+
+### Fixed
+- **Performance**: Improved rendering performance by eliminating heavy Plotly.js bundle
+- **Reliability**: Enhanced stability using proven QuantStats HTML generation instead of custom chart implementations
+
 ## [2.0.0] - 2025-01-03
 ### Added
 - **Modern Next.js Frontend**: Complete Next.js 15 application with App Router and Server Components
