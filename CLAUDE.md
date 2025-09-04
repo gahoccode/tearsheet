@@ -57,7 +57,7 @@ tearsheet/
 ### Backend Components (Flask API)
 - **api.py**: JSON API endpoints:
   - `GET /api/health`: Health check
-  - `POST /api/analyze`: Portfolio analysis
+  - `POST /api/tearsheet`: QuantStats HTML tearsheet generation
   - `POST /api/validate`: Input validation
   - `POST /api/ratios`: Financial ratios analysis
 - **src/**: Modular service architecture with core business logic
@@ -67,8 +67,7 @@ tearsheet/
 - **Next.js 15**: App Router with Server Components and Turbopack
 - **TypeScript**: Full type safety throughout the application
 - **Tailwind CSS**: Utility-first responsive design
-- **Plotly.js**: Interactive chart library with advanced visualizations
-- **React Query**: Advanced data fetching and caching
+- **TanStack Query**: Advanced data fetching and caching
 - **React Hook Form + Zod**: Form handling with schema validation
 
 ### Data Flow
@@ -78,8 +77,9 @@ tearsheet/
 4. Flask API validates input and processes portfolio data
 5. vnstock API fetches Vietnam stock data via `Quote.history()`
 6. Portfolio returns calculated using weighted sum of individual stock returns
-7. JSON response sent back to frontend with metrics and analysis data
-8. Frontend renders interactive charts and analytics using Plotly.js
+7. QuantStats generates complete HTML tearsheet with embedded visualizations
+8. JSON response sent back to frontend with HTML content
+9. Frontend renders tearsheet using React's dangerouslySetInnerHTML
 
 ### Key Dependencies
 
@@ -96,7 +96,6 @@ tearsheet/
 - **React 19**: Latest React with improved performance
 - **TypeScript**: Type safety and development experience
 - **Tailwind CSS 4**: Utility-first CSS framework
-- **Plotly.js**: Interactive chart library with advanced visualizations (v2.35.2)
 - **TanStack Query**: Data fetching, caching, and state management
 - **React Hook Form**: Form handling with performance optimization
 - **Zod**: TypeScript-first schema validation
@@ -129,33 +128,37 @@ NODE_ENV=development
 NEXT_PUBLIC_API_TIMEOUT=30000
 ```
 
-### Plotly.js Chart Implementation
+### QuantStats HTML Tearsheet Implementation
 
-#### Chart Data Service (Backend)
-- **File**: `backend/src/services/chart_data_service.py`
-- **Purpose**: Generates Plotly chart data configurations instead of HTML
-- **Returns**: JSON objects with `data` and `layout` properties for frontend consumption
-- **Chart Types**:
-  - Portfolio Performance: Line chart showing cumulative returns over time
-  - Drawdown Analysis: Area chart displaying portfolio drawdowns
-  - Portfolio Composition: Pie chart with asset allocation percentages
-  - Metrics Dashboard: Bar chart with key performance indicators
+#### Tearsheet Generation (Backend)
+- **File**: `backend/api.py` - `/api/tearsheet` endpoint
+- **Purpose**: Generates complete QuantStats HTML tearsheets using `qs.reports.html()`
+- **Process**: 
+  - Creates temporary HTML file
+  - Generates comprehensive tearsheet with all visualizations
+  - Returns HTML content as JSON response
+  - Cleans up temporary files automatically
+- **Features**:
+  - Professional financial report formatting
+  - Built-in performance charts and metrics
+  - Comprehensive risk analysis visualizations
+  - Industry-standard tearsheet layout
 
-#### Dynamic Plotly Component (Frontend)
-- **File**: `frontend/src/components/charts/DynamicPlotlyChart.tsx`
-- **CDN Version**: Plotly.js v2.35.2 (loads dynamically from CDN)
+#### Tearsheet Display Component (Frontend)
+- **File**: `frontend/src/components/QuantStatsTearsheet.tsx`
+- **Purpose**: Displays QuantStats HTML content in React application
+- **Implementation**: Uses `dangerouslySetInnerHTML` for HTML rendering
 - **Features**: 
-  - Responsive design with automatic resizing
-  - Interactive controls (zoom, pan, hover tooltips)
-  - Error handling with fallback UI
-  - TypeScript support with proper type definitions
-- **Usage**: Accepts `data`, `layout`, and optional `config` props
+  - Responsive design with proper styling
+  - Error handling and loading states
+  - Professional tearsheet presentation
+  - TypeScript support with proper interfaces
 
-#### Chart Integration Notes
-- **Backend Response**: API returns chart configurations as JSON objects
-- **Frontend Rendering**: Charts render client-side using dynamically loaded Plotly.js
-- **Performance**: CDN loading reduces bundle size, charts cached after first load
-- **Compatibility**: Works with React 19 and Next.js 15 with Turbopack
+#### Integration Benefits
+- **Simplicity**: Single API endpoint vs. multiple chart endpoints
+- **Performance**: No heavy client-side chart libraries
+- **Reliability**: Proven QuantStats library with consistent output
+- **Professional Quality**: Industry-standard financial tearsheet format
 
 ### Testing Strategy
 
@@ -169,9 +172,29 @@ NEXT_PUBLIC_API_TIMEOUT=30000
 - **Component Testing**: React component rendering and user interactions
 - **API Integration**: Frontend-to-backend API communication
 - **Form Validation**: Client-side validation with Zod schemas
-- **Chart Rendering**: Plotly.js visualization accuracy
+- **Tearsheet Rendering**: QuantStats HTML display accuracy
 
 #### Full Stack Testing
-- **End-to-End**: Complete user workflows from form submission to chart display
+- **End-to-End**: Complete user workflows from form submission to tearsheet display
 - **Cross-Origin**: CORS configuration between frontend and backend
 - **Error Handling**: Graceful error handling across both applications
+
+## Lessons Learned
+
+### Architecture Decisions
+- **Simplicity Over Complexity**: Choose proven solutions (QuantStats) over custom implementations (Plotly.js)
+- **Library Evaluation**: Thoroughly evaluate existing solutions before building custom components
+- **Microservices Benefits**: Independent frontend/backend development and deployment
+- **TypeScript Value**: Full type safety significantly improves development experience
+
+### Implementation Best Practices
+- **API Design**: Single-purpose endpoints are easier to maintain than complex multi-function APIs
+- **HTML Generation**: Server-side HTML generation (QuantStats) is more reliable than client-side chart libraries
+- **Error Handling**: Multi-layer validation (client + server) provides better user experience
+- **Cleanup Strategy**: Always clean up temporary files and unused dependencies
+
+### Development Workflow
+- **Dual Terminal Setup**: Running frontend and backend in separate terminals enables efficient development
+- **Environment Variables**: Proper environment configuration prevents CORS and connectivity issues
+- **Testing Strategy**: Test both individual services and full stack integration
+- **Documentation**: Keep architecture documentation updated with implementation changes

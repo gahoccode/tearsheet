@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Tearsheet Portfolio Analyzer follows a stateless, data-driven architecture where data flows from external sources through processing layers to generate analytical reports. The system does not maintain persistent storage, instead relying on real-time data retrieval and in-memory processing.
+The Tearsheet Portfolio Analyzer follows a modern **microservices data architecture** where data flows from external sources through a Flask API backend to generate QuantStats HTML tearsheets for display in a Next.js frontend. The system maintains a stateless approach with no persistent storage, emphasizing real-time data processing and HTML generation.
 
 ## Data Sources
 
@@ -35,46 +35,87 @@ The Tearsheet Portfolio Analyzer follows a stateless, data-driven architecture w
 
 ```mermaid
 flowchart TD
-    A[User Input] --> B[Validation Service]
-    B --> C{Input Valid?}
-    C -->|No| D[Error Response]
-    C -->|Yes| E[Portfolio Model Creation]
+    A[Next.js Frontend Form] --> B[Zod Client Validation]
+    B --> C{Client Valid?}
+    C -->|No| D[Frontend Error Display]
+    C -->|Yes| E[HTTP POST to Flask API]
     
-    E --> F[Data Fetcher Service]
-    F --> G[VNStock API]
-    G --> H[Raw Market Data]
+    E --> F[Flask API Endpoint]
+    F --> G[Python Server Validation]
+    G --> H{Server Valid?}
+    H -->|No| I[JSON Error Response]
+    H -->|Yes| J[Portfolio Model Creation]
     
-    H --> I[Data Transformation]
-    I --> J[Portfolio Analysis]
-    J --> K[QuantStats Processing]
+    J --> K[Data Fetcher Service]
+    K --> L[VNStock API]
+    L --> M[Raw Market Data]
     
-    K --> L[Report Generation]
-    L --> M[Static File Output]
-    M --> N[User Response]
+    M --> N[Portfolio Analysis]
+    N --> O[QuantStats HTML Generation]
+    O --> P[Temporary HTML File]
+    P --> Q[HTML Content Read]
+    Q --> R[JSON Response with HTML]
     
-    subgraph "Financial Ratios Flow"
-        O[Ratio Request] --> P[Symbol Validation]
-        P --> Q[VNStock Service]
-        Q --> R[Ratio Data Retrieval]
-        R --> S[Data Processing]
-        S --> T[Excel Export / Display]
+    R --> S[Frontend Receives HTML]
+    S --> T[React Renders via dangerouslySetInnerHTML]
+    
+    subgraph "Frontend (Port 3000)"
+        A
+        B
+        D
+        S
+        T
     end
     
-    subgraph "Data Processing Layer"
-        I
+    subgraph "Backend (Port 5001)"
+        F
+        G
         J
-        S
+        K
+        N
+        O
+        P
+        Q
+        R
     end
     
     subgraph "External APIs"
-        G
-        Q
+        L
+    end
+    
+    subgraph "Temporary Storage"
+        P
     end
 ```
 
 ## Data Models
 
-### Core Data Models
+### Frontend Data Models (TypeScript)
+
+#### Portfolio Form Data
+```typescript
+interface PortfolioFormData {
+  symbols: string[];      // Stock ticker symbols
+  weights: number[];      // Portfolio allocation weights
+  capital: number;        // Initial investment amount
+  start_date: string;     // Analysis start date (YYYY-MM-DD)
+  end_date: string;       // Analysis end date (YYYY-MM-DD)
+  name?: string;          // Portfolio identifier
+}
+```
+
+#### Tearsheet Response
+```typescript
+interface TearsheetResponse {
+  html: string;           // Complete QuantStats HTML content
+  portfolio_name: string; // Portfolio identifier
+  symbols: string[];      // List of stock symbols
+  period: string;         // Analysis period description
+  data_points: number;    // Number of data points analyzed
+}
+```
+
+### Backend Data Models (Python)
 
 #### Stock Model
 ```python
@@ -109,51 +150,56 @@ class Portfolio:
 - Date range: maximum 10 years, start < end
 - End date cannot be in the future
 
-#### Portfolio Analysis Model
-```python
-@dataclass
-class PortfolioAnalysis:
-    portfolio: Portfolio              # Original portfolio
-    returns_data: pd.Series          # Time series of portfolio returns
-    metrics: Dict[str, float]        # Performance metrics
-    individual_returns: Optional[pd.DataFrame]  # Individual stock returns
-    analysis_timestamp: datetime     # Analysis execution time
-```
-
 ### Data Transformation Pipeline
 
-#### 1. Input Data Processing
-- **Source**: HTML form data or API requests
+#### 1. Frontend Data Processing
+- **Source**: React form inputs (PortfolioForm.tsx)
 - **Processing**: 
-  - String cleaning and normalization
-  - Type conversion (strings to floats/dates)
-  - Input validation and sanitization
-- **Output**: Validated data objects
+  - Zod schema validation
+  - TypeScript type enforcement
+  - Real-time form validation feedback
+- **Output**: Validated PortfolioFormData objects
 
-#### 2. Historical Data Retrieval
+#### 2. API Data Transmission
+- **Source**: Frontend validated data
+- **Processing**:
+  - JSON serialization
+  - HTTP POST to `/api/tearsheet` endpoint
+  - Axios request configuration and error handling
+- **Output**: HTTP request to Flask backend
+
+#### 3. Backend Data Processing
+- **Source**: JSON API requests
+- **Processing**:
+  - Python validation service
+  - Portfolio model instantiation
+  - Data type conversion and normalization
+- **Output**: Validated Python data structures
+
+#### 4. Historical Data Retrieval
 - **Source**: VNStock API responses
 - **Processing**:
   - JSON parsing and extraction
   - Date range filtering
   - Missing data handling
-  - Column standardization
-- **Output**: Pandas DataFrame with OHLCV data
+  - Pandas DataFrame creation
+- **Output**: Structured market data
 
-#### 3. Portfolio Return Calculation
-- **Input**: Price data + portfolio weights
+#### 5. QuantStats HTML Generation
+- **Input**: Portfolio returns and configuration
 - **Processing**:
-  - Daily return calculation: `(price_t - price_t-1) / price_t-1`
-  - Weighted portfolio returns: `sum(weight_i * return_i)`
-  - Cumulative return aggregation
-- **Output**: Portfolio return time series
+  - Complete tearsheet generation via `qs.reports.html()`
+  - Temporary file creation and management
+  - HTML content extraction
+- **Output**: Complete HTML tearsheet content
 
-#### 4. Performance Metrics Calculation
-- **Calculations**:
-  - Total Return: `(final_value - initial_value) / initial_value`
-  - Volatility: Standard deviation of returns (annualized)
-  - Sharpe Ratio: `(return - risk_free_rate) / volatility`
-  - Maximum Drawdown: Largest peak-to-trough decline
-  - Win Rate: Percentage of positive return periods
+#### 6. Frontend HTML Rendering
+- **Input**: JSON response with HTML content
+- **Processing**:
+  - TanStack Query state management
+  - React component rendering
+  - HTML injection via `dangerouslySetInnerHTML`
+- **Output**: Displayed QuantStats tearsheet
 
 ## Data Quality and Validation
 
@@ -201,16 +247,16 @@ class PortfolioAnalysis:
 ## Caching and Performance
 
 ### Caching Strategy
-- **No Persistent Storage**: Stateless architecture
-- **Session-based Caching**: Temporary data during user session
-- **API Response Caching**: Short-term caching of external API calls
-- **Static Asset Caching**: Long-term caching of CSS/JS/images
+- **Frontend Caching**: TanStack Query automatic API response caching
+- **No Persistent Storage**: Stateless microservices architecture
+- **Temporary File Management**: HTML tearsheets cleaned up after response
+- **CDN Integration**: Next.js automatic static asset optimization
 
 ### Performance Optimization
-- **Lazy Loading**: Load data only when needed
-- **Batch API Requests**: Minimize external API calls
-- **Efficient Data Structures**: Pandas optimization for numerical data
-- **Parallel Processing**: Concurrent data fetching where possible
+- **Server-Side Rendering**: Next.js App Router for improved performance
+- **API Optimization**: Efficient Flask API with minimal overhead
+- **Bundle Optimization**: Next.js Turbopack for faster builds
+- **QuantStats Native**: Leveraging proven tearsheet generation instead of custom charts
 
 ## Data Security and Privacy
 

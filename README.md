@@ -1,6 +1,6 @@
 # Vietnam Stock Portfolio Analyzer
 
-A modern full-stack application for analyzing Vietnamese stock portfolios with interactive visualizations and comprehensive performance metrics.
+A modern full-stack application for analyzing Vietnamese stock portfolios with comprehensive QuantStats tearsheet reports and performance metrics.
 
 ## Architecture
 
@@ -8,11 +8,11 @@ This application follows a modern **Next.js + Flask API** architecture with comp
 
 ```
 tearsheet/
-├── backend/           # Flask API server
+├── backend/           # Flask API server (Port 5001)
 │   ├── api.py        # Main API endpoints
 │   ├── src/          # Core business logic
 │   └── tests/        # API tests
-└── frontend/         # Next.js application
+└── frontend/         # Next.js application (Port 3000)
     ├── src/          # React components & utilities
     └── public/       # Static assets
 ```
@@ -20,10 +20,11 @@ tearsheet/
 ## Features
 
 ### 📊 Portfolio Analysis
-- **Interactive Charts**: Performance, drawdown, and composition analysis using Recharts
+- **QuantStats Tearsheets**: Professional HTML reports with comprehensive analytics
 - **Risk Metrics**: Sharpe ratio, volatility, maximum drawdown analysis
 - **Performance Tracking**: Returns, win rate, risk assessment
 - **Vietnamese Market Data**: Real-time integration with vnstock API
+- **Interactive Interface**: Modern React-based portfolio input forms
 
 ### 🎨 Modern Frontend
 - **Next.js 15**: App Router with Server Components and Turbopack
@@ -34,127 +35,179 @@ tearsheet/
 
 ### 🔧 Robust Backend
 - **Flask API**: JSON-only endpoints with CORS support
+- **QuantStats Integration**: Complete HTML tearsheet generation using `qs.reports.html()`
 - **Data Validation**: Comprehensive input validation and error handling
 - **Modular Architecture**: Clean separation of concerns
 
-## Project Structure
-- app.py: Flask backend (**implemented**)
-- data_loader.py: Data loader for historical prices (**implemented**)
-- templates/: HTML templates (**implemented**)
-- static/: CSS and JS (**implemented**)
-- tests/: Unit and integration tests (**implemented**)
+## Development Setup
 
-## Setup Instructions
+### Prerequisites
+- Python >= 3.9
+- Node.js >= 18
+- uv (Python package manager)
+- npm or yarn
 
-### 1. Create and activate a virtual environment (Windows, Command Prompt)
+### Backend Setup
 
-```cmd
-python -m venv venv
-venv\Scripts\activate
+1. **Navigate to backend directory**:
+```bash
+cd backend
 ```
 
-### 2. Install dependencies
-
-```cmd
-pip install -r requirements.txt
-```
-
-Alternatively, using uv:
-
-```cmd
-pip install uv
+2. **Install dependencies**:
+```bash
 uv pip install --all --upgrade --refresh
 ```
 
-### 3. Run the app
-
-```cmd
-python app.py
+3. **Set environment variables**:
+Create `.env` file in backend directory:
+```bash
+SECRET_KEY=your-secret-key-here
+PORT=5001
 ```
 
-The app will be available at http://127.0.0.1:5000
+4. **Start Flask API**:
+```bash
+PORT=5001 uv run python api.py
+```
 
-After analyzing a portfolio, you will be redirected to a full QuantStats HTML report (tear sheet) at `/static/reports/quantstats-results.html`.
+Backend will be available at http://localhost:5001
 
-## Data Loader Usage
+### Frontend Setup
 
-The data loader is implemented in `data_loader.py`:
+1. **Navigate to frontend directory**:
+```bash
+cd frontend
+```
+
+2. **Install dependencies**:
+```bash
+npm install
+```
+
+3. **Set environment variables**:
+Create `.env.local` file in frontend directory:
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:5001
+NODE_ENV=development
+```
+
+4. **Start Next.js development server**:
+```bash
+npm run dev
+```
+
+Frontend will be available at http://localhost:3000
+
+### Full Stack Development
+
+Run both servers simultaneously:
+- **Terminal 1**: `cd backend && PORT=5001 uv run python api.py`
+- **Terminal 2**: `cd frontend && npm run dev`
+
+Access the application at http://localhost:3000
+
+## API Endpoints
+
+### Backend API (Port 5001)
+- `GET /api/health`: Health check endpoint
+- `POST /api/validate`: Validate portfolio input data
+- `POST /api/tearsheet`: Generate QuantStats HTML tearsheet
+- `POST /api/ratios`: Financial ratios analysis
+
+### Example API Usage
 
 ```python
-from data_loader import fetch_historical_data, get_close_prices
-symbols = ['REE', 'FMC', 'DHC']
-data = fetch_historical_data(symbols, '2024-01-01', '2024-03-19')
-close_prices = get_close_prices(data, symbols)
+# Generate tearsheet
+response = requests.post('http://localhost:5001/api/tearsheet', json={
+    'symbols': ['REE', 'FMC', 'DHC'],
+    'weights': [0.4, 0.3, 0.3],
+    'capital': 100000000,
+    'start_date': '2024-01-01',
+    'end_date': '2024-12-31',
+    'name': 'My Portfolio'
+})
 ```
 
 ## Testing
-- Unit and integration tests are located in `tests/`
-- Tests verify:
-  - Routing and redirection to the QuantStats HTML report
-  - HTML report file creation
-  - Matplotlib backend is set to 'Agg' (for server-side rendering)
 
-To run all tests:
-
-```cmd
-pytest tests/test_app.py
+### Backend Testing
+```bash
+cd backend && pytest tests/test_app.py
 ```
 
-## Python Version
-- Requires Python >= 3.9
+### Frontend Testing
+```bash
+cd frontend && npm run type-check
+cd frontend && npm run lint
+```
 
-## Troubleshooting & Notes
-- **Matplotlib GUI errors:** The backend is set to `'Agg'` for server-side image generation. If you see errors about "main thread is not in main loop", ensure this setting is present at the top of `app.py`:
-  ```python
-  import matplotlib
-  matplotlib.use('Agg')
-  ```
-- **Navigation:** For best UX, add a "Back to Home" button/link in the QuantStats HTML report pointing to `/`.
-- **Static report cleanup:** The generated HTML report (`static/reports/quantstats-results.html`) may be overwritten on each new analysis.
+### Full Integration Test
+1. Start both servers
+2. Visit http://localhost:3000
+3. Submit portfolio analysis form
+4. Verify QuantStats tearsheet displays correctly
 
-## Container Deployment with GHCR
+## Technical Details
 
-### GitHub Container Registry (GHCR) Workflow
+### Data Flow
+1. User submits portfolio form in Next.js frontend
+2. Frontend validates input using Zod schemas
+3. API request sent to Flask backend at `/api/tearsheet`
+4. Backend fetches Vietnam stock data via vnstock API
+5. QuantStats generates complete HTML tearsheet using `qs.reports.html()`
+6. HTML content returned to frontend as JSON response
+7. Frontend renders tearsheet using `dangerouslySetInnerHTML`
 
-This repository includes an automated workflow to build and publish Docker images to GitHub Container Registry (GHCR) on every push to `main` or `master` branches.
+### Key Technologies
+- **Backend**: Flask + vnstock + QuantStats + pandas
+- **Frontend**: Next.js 15 + React 19 + TypeScript + Tailwind CSS
+- **Data**: Vietnamese stock market data via vnstock API
+- **Visualization**: QuantStats HTML tearsheets with built-in charts
 
-#### How it works
-- **Trigger**: Workflow runs automatically on push to main/master branches
-- **Build**: Uses Docker Buildx for multi-platform builds
-- **Publish**: Pushes to `ghcr.io/{username}/quantstatswebapp`
-- **Tags**: Includes branch name, commit SHA, and `latest` for main branch
+## Troubleshooting
 
-#### Usage
+### Common Issues
+- **Port conflicts**: Backend uses 5001, frontend uses 3000 (avoiding macOS AirPlay)
+- **CORS errors**: Ensure `NEXT_PUBLIC_API_URL=http://localhost:5001` in frontend `.env.local`
+- **API timeout**: Large portfolios may take time to process - timeout set to 30s
+- **Stock symbols**: Use Vietnamese stock symbols (REE, FMC, DHC, etc.)
 
-1. **Enable GitHub Packages**: Ensure GitHub Packages is enabled for your repository
-2. **Set Permissions**: The workflow automatically uses `GITHUB_TOKEN` for authentication
-3. **View Images**: Published images appear in your repository's "Packages" section
+## Deployment
 
-#### Pull the image
+### Docker Deployment
+
+```bash
+# Build the application
+docker build -t tearsheet-app .
+
+# Run with environment variables
+docker run -p 5000:5000 -e PORT=5000 tearsheet-app
+```
+
+### Production Environment Variables
+
+**Backend**:
+```bash
+SECRET_KEY=your-production-secret-key
+PORT=5001
+FLASK_ENV=production
+```
+
+**Frontend**:
+```bash
+NEXT_PUBLIC_API_URL=https://your-api-domain.com
+NODE_ENV=production
+```
+
+### GitHub Container Registry (GHCR)
+
+Automated builds available at `ghcr.io/{username}/quantstatswebapp:latest`:
 
 ```bash
 docker pull ghcr.io/{your-username}/quantstatswebapp:latest
-```
-
-#### Run the container
-
-```bash
 docker run -p 5000:5000 -e PORT=5000 ghcr.io/{your-username}/quantstatswebapp:latest
 ```
-
-#### Manual Build (Optional)
-
-If you want to build locally:
-
-```bash
-docker build -t quantstatswebapp .
-docker run -p 5000:5000 -e PORT=5000 quantstatswebapp
-```
-
-### Environment Variables
-
-The container accepts the following environment variables:
-- `PORT`: Port to run the application on (default: 5000)
 
 ## License
 MIT

@@ -2,105 +2,132 @@
 
 ## Overview
 
-The Tearsheet Portfolio Analyzer follows a modular, layered architecture with clear separation of concerns. The system is organized into distinct layers and modules to promote maintainability, testability, and scalability.
+The Tearsheet Portfolio Analyzer follows a modern **microservices architecture** with complete separation between frontend and backend. The system is organized as a Next.js frontend application communicating with a Flask API backend, promoting scalability, maintainability, and independent deployment.
 
 ## Architectural Patterns
 
-### Layered Architecture
-- **Presentation Layer**: Web interface and API endpoints
-- **Service Layer**: Business logic and orchestration
-- **Data Layer**: Data access and external integrations
-- **Utilities Layer**: Cross-cutting concerns and helpers
+### Microservices Architecture
+- **Frontend Service**: Next.js 15 application (Port 3000)
+- **Backend Service**: Flask API server (Port 5001)
+- **Independent Deployment**: Each service can be deployed separately
+- **API-First Design**: Communication via JSON REST APIs
 
-### Dependency Injection
-- Service dependencies injected at application startup
-- Promotes loose coupling and testability
-- Configuration-driven service instantiation
+### Frontend Patterns (Next.js)
+- **App Router**: Next.js 15 App Router for server-side rendering
+- **React Server Components**: Enhanced performance and SEO
+- **Client-Side State Management**: TanStack Query for API state
+- **TypeScript**: Full type safety throughout the frontend
 
-### Repository Pattern
-- Abstract data access through service interfaces
-- Consistent data access patterns
-- Easy mocking for unit tests
+### Backend Patterns (Flask)
+- **API-Only Design**: JSON-only endpoints with CORS support
+- **Service Layer**: Business logic orchestration
+- **Repository Pattern**: Data access abstraction
+- **Dependency Injection**: Service composition at startup
 
 ## Component Structure
 
 ```mermaid
 C4Component
-    title Component Diagram - Tearsheet Portfolio Analyzer
+    title Component Diagram - Tearsheet Portfolio Analyzer (Microservices)
     
-    Container_Boundary(web, "Web Application") {
-        Component(flask_app, "Flask Application", "Flask", "Main web server and routing")
-        Component(templates, "Templates", "Jinja2", "HTML templates and UI")
-        Component(static, "Static Assets", "CSS/JS", "Stylesheets and client-side scripts")
+    Container_Boundary(frontend, "Frontend Application (Next.js)") {
+        Component(app_router, "App Router", "Next.js 15", "Route management and SSR")
+        Component(react_components, "React Components", "React 19", "UI components and forms")
+        Component(api_client, "API Client", "Axios", "HTTP client for backend communication")
+        Component(state_mgmt, "State Management", "TanStack Query", "API state and caching")
+        Component(validation_schemas, "Validation Schemas", "Zod", "Client-side form validation")
     }
     
-    Container_Boundary(services, "Service Layer") {
-        Component(validation, "Validation Service", "Python", "Input validation and sanitization")
-        Component(vnstock, "VNStock Service", "Python", "Vietnam stock market integration")
-        Component(portfolio, "Portfolio Service", "Python", "Portfolio analysis orchestration")
+    Container_Boundary(backend, "Backend API (Flask)") {
+        Component(flask_api, "Flask API", "Flask", "JSON API endpoints with CORS")
+        Component(validation_service, "Validation Service", "Python", "Input validation and sanitization")
+        Component(tearsheet_service, "Tearsheet Service", "Python", "QuantStats HTML generation")
+        Component(vnstock_service, "VNStock Service", "Python", "Vietnam stock market integration")
     }
     
-    Container_Boundary(core, "Core Layer") {
-        Component(data_fetcher, "Data Fetcher", "Python", "Data retrieval and caching")
-        Component(analyzer, "Portfolio Analyzer", "Python", "Performance calculations")
-        Component(models, "Data Models", "Python", "Business entity models")
+    Container_Boundary(core, "Core Services") {
+        Component(data_fetcher, "Data Fetcher", "Python", "Data retrieval and processing")
+        Component(portfolio_analyzer, "Portfolio Analyzer", "Python", "Performance calculations")
+        Component(quantstats_wrapper, "QuantStats Wrapper", "Python", "HTML tearsheet generation")
+    }
+    
+    Container_Boundary(models, "Data Models") {
+        Component(typescript_types, "TypeScript Types", "TypeScript", "Frontend type definitions")
+        Component(python_models, "Python Models", "Python", "Backend data models")
     }
     
     Container_Boundary(utils, "Utilities") {
-        Component(exceptions, "Exception Handling", "Python", "Custom exceptions")
-        Component(helpers, "Helper Functions", "Python", "Common utilities")
-        Component(constants, "Constants", "Python", "Application constants")
+        Component(frontend_utils, "Frontend Utils", "TypeScript", "UI helpers and formatters")
+        Component(backend_utils, "Backend Utils", "Python", "Server-side utilities")
     }
     
-    Container_Boundary(config, "Configuration") {
-        Component(base_config, "Base Config", "Python", "Base configuration")
-        Component(env_configs, "Environment Configs", "Python", "Environment-specific settings")
-    }
+    Rel(react_components, api_client, "makes requests")
+    Rel(api_client, flask_api, "HTTP/JSON", "Port 5001")
+    Rel(state_mgmt, api_client, "manages API state")
+    Rel(validation_schemas, react_components, "validates forms")
     
-    Rel(flask_app, templates, "renders")
-    Rel(flask_app, validation, "validates input")
-    Rel(flask_app, vnstock, "fetches ratios")
-    Rel(flask_app, portfolio, "analyzes portfolio")
+    Rel(flask_api, validation_service, "validates input")
+    Rel(flask_api, tearsheet_service, "generates tearsheets")
+    Rel(flask_api, vnstock_service, "fetches ratios")
     
-    Rel(portfolio, data_fetcher, "fetches data")
-    Rel(portfolio, analyzer, "calculates metrics")
-    Rel(portfolio, models, "creates instances")
+    Rel(tearsheet_service, data_fetcher, "gets market data")
+    Rel(tearsheet_service, portfolio_analyzer, "calculates metrics")
+    Rel(tearsheet_service, quantstats_wrapper, "generates HTML")
     
-    Rel(vnstock, data_fetcher, "uses")
-    Rel(data_fetcher, models, "populates")
-    
-    Rel_Back(exceptions, validation, "handles errors")
-    Rel_Back(helpers, analyzer, "uses utilities")
-    Rel_Back(constants, validation, "uses constants")
+    Rel(vnstock_service, data_fetcher, "uses data layer")
+    Rel_Back(typescript_types, react_components, "provides types")
+    Rel_Back(python_models, flask_api, "data structures")
 ```
 
 ## Layer Details
 
-### Presentation Layer (`app.py` + `templates/`)
+## Frontend Layer (Next.js Application)
 
-#### Flask Application (`app.py`)
+### Next.js App Router (`frontend/src/app/`)
 - **Responsibilities**:
-  - HTTP request handling and routing
-  - Request/response processing
-  - Error handling and user feedback
-  - Session management
-  - Static file serving
+  - Server-side rendering and static generation
+  - Route management and navigation
+  - SEO optimization and metadata
+  - Client-side hydration
 
 - **Key Routes**:
-  - `GET /` - Portfolio input form
-  - `POST /analyze` - Portfolio analysis processing
-  - `GET /ratios` - Financial ratios input form
-  - `POST /ratios/analyze` - Ratio analysis processing
-  - `GET /api/ratios/<symbol>` - JSON API for single symbol ratios
+  - `/` - Main portfolio analysis page
+  - API routes handled by backend
 
-#### Templates (`templates/`)
-- **Components**:
-  - `index.html` - Portfolio analysis interface
-  - `ratios.html` - Financial ratios interface
-  - `ratio_results.html` - Ratio analysis results
-  - `results.html` - Portfolio analysis results (legacy)
+### React Components (`frontend/src/components/`)
+- **Core Components**:
+  - `PortfolioForm.tsx` - Portfolio input form with validation
+  - `QuantStatsTearsheet.tsx` - HTML tearsheet display
+  - UI components with TypeScript and Tailwind CSS
 
-### Service Layer (`src/services/`)
+### API Client (`frontend/src/lib/api.ts`)
+- **Responsibilities**:
+  - HTTP client configuration (Axios)
+  - API request/response handling
+  - Error handling and retry logic
+  - TypeScript integration
+
+- **Key Methods**:
+  - `generateTearsheet()` - Portfolio tearsheet generation
+  - `validatePortfolio()` - Input validation
+  - `fetchRatios()` - Financial ratios retrieval
+
+## Backend Layer (Flask API)
+
+### Flask API Server (`backend/api.py`)
+- **Responsibilities**:
+  - JSON API endpoints with CORS support
+  - Request routing and middleware
+  - Error handling and HTTP responses
+  - Authentication and security headers
+
+- **Key Endpoints**:
+  - `GET /api/health` - Health check endpoint
+  - `POST /api/tearsheet` - Generate QuantStats HTML tearsheet
+  - `POST /api/validate` - Portfolio input validation
+  - `POST /api/ratios` - Financial ratios analysis
+
+### Backend Service Layer (`backend/src/services/`)
 
 #### Validation Service
 - **Purpose**: Input validation and sanitization
@@ -119,7 +146,7 @@ C4Component
   - `get_fundamental_summary()` - Key metrics summary
   - `export_ratios_to_excel()` - Excel export functionality
 
-### Core Layer (`src/core/`)
+### Backend Core Layer (`backend/src/core/`)
 
 #### Data Fetcher
 - **Purpose**: Centralized data retrieval and processing
@@ -136,7 +163,16 @@ C4Component
   - `validate_portfolio()` - Portfolio validation
   - `get_portfolio_summary()` - Summary statistics
 
-### Data Models (`src/models/`)
+### Data Models
+
+#### Frontend Types (`frontend/src/types/`)
+- **TypeScript Interfaces**:
+  - `PortfolioFormData` - Form input structure
+  - `TearsheetResponse` - API response types
+  - `ValidationResponse` - Validation result types
+  - Full type safety across React components
+
+#### Backend Models (`backend/src/models/`)
 
 #### Stock Model
 - **Attributes**: symbol, weight, name, sector
@@ -152,7 +188,16 @@ C4Component
 - **Attributes**: portfolio, returns data, metrics
 - **Methods**: Summary statistics, serialization
 
-### Utilities (`src/utils/`)
+### Utilities
+
+#### Frontend Utils (`frontend/src/lib/`)
+- **Utilities**:
+  - Form validation schemas (Zod)
+  - Date and currency formatters
+  - API configuration and types
+  - UI helper functions
+
+#### Backend Utils (`backend/src/utils/`)
 
 #### Exception Handling
 - **Custom Exceptions**:
@@ -177,20 +222,21 @@ C4Component
 
 ## Data Flow
 
-### Portfolio Analysis Flow
-1. **Input Validation**: Form data validated by ValidationService
-2. **Portfolio Creation**: Portfolio model instantiated with validated data
-3. **Data Fetching**: DataFetcher retrieves historical price data
-4. **Analysis**: PortfolioAnalyzer calculates performance metrics
-5. **Report Generation**: QuantStats generates HTML tearsheet
-6. **Response**: User redirected to generated report
+### Modern Tearsheet Flow (Next.js + Flask)
+1. **User Input**: Form submission in Next.js frontend
+2. **Client Validation**: Zod schema validation in React
+3. **API Request**: HTTP POST to Flask backend `/api/tearsheet`
+4. **Server Validation**: Python validation service processes input
+5. **Data Fetching**: VNStock API retrieval of market data
+6. **Portfolio Analysis**: QuantStats generates complete HTML tearsheet
+7. **JSON Response**: HTML content returned to frontend
+8. **Client Rendering**: React displays tearsheet using `dangerouslySetInnerHTML`
 
-### Financial Ratio Analysis Flow
-1. **Input Processing**: Symbol list parsed and validated
-2. **Data Retrieval**: VNStockService fetches ratio data
-3. **Data Processing**: Ratio data formatted and summarized
-4. **Export** (optional): Excel export via VNStockService
-5. **Results Display**: Ratio results rendered in template
+### Cross-Origin Communication
+- **CORS Configuration**: Flask backend enables cross-origin requests
+- **Environment Variables**: API URLs configured via environment
+- **Error Handling**: Comprehensive error boundaries and user feedback
+- **Loading States**: Progressive UI updates during analysis
 
 ## Configuration Management
 
@@ -206,46 +252,74 @@ C4Component
 
 ## Error Handling Strategy
 
-### Exception Hierarchy
-- Base exceptions for different error categories
-- Specific exceptions for detailed error classification
-- Consistent error messages and user feedback
+### Frontend Error Handling
+- **React Error Boundaries**: Component-level error isolation
+- **API Error Handling**: TanStack Query error management
+- **Form Validation**: Real-time validation with user feedback
+- **Loading States**: Progressive enhancement during API calls
 
-### Error Boundaries
-- Service-level error handling and recovery
-- Graceful degradation for non-critical failures
-- User-friendly error messages and guidance
+### Backend Error Handling
+- **Exception Hierarchy**: Structured error classification
+- **API Error Responses**: Consistent JSON error format
+- **Logging**: Comprehensive error tracking and monitoring
+- **Graceful Degradation**: Partial results when possible
+
+### Cross-Service Error Handling
+- **Network Errors**: Retry logic and offline handling
+- **Timeout Management**: Request timeout configuration
+- **Service Unavailability**: Fallback mechanisms
+- **User Communication**: Clear error messages and guidance
 
 ## Testing Architecture
 
-### Unit Testing
-- Individual component testing
-- Mock dependencies for isolation
-- Test fixtures for consistent data
+### Frontend Testing
+- **Component Testing**: React component testing with Jest/Testing Library
+- **Type Checking**: TypeScript compilation and type validation
+- **Lint Testing**: ESLint and Prettier code quality checks
+- **API Integration**: Mock API responses for component testing
 
-### Integration Testing
-- Service integration validation
-- End-to-end workflow testing
-- External API integration testing
+### Backend Testing
+- **Unit Testing**: Individual service and model testing
+- **API Testing**: HTTP endpoint testing with test client
+- **Integration Testing**: Full workflow testing with real data
+- **External API Testing**: VNStock integration validation
 
-### Test Organization
-- Test modules mirror source structure
-- Shared fixtures and utilities
-- Automated test execution pipeline
+### End-to-End Testing
+- **Full Stack Testing**: Complete user workflow validation
+- **Cross-Browser Testing**: Frontend compatibility testing
+- **Performance Testing**: API response time and frontend rendering
+- **Error Handling**: Comprehensive error scenario testing
 
 ## Security Considerations
 
-### Input Validation
-- Multi-layer validation approach
-- SQL injection prevention
-- XSS protection measures
+### Frontend Security
+- **XSS Protection**: React's built-in XSS protection
+- **Content Security Policy**: Strict CSP headers
+- **Input Sanitization**: Zod validation schemas
+- **HTTPS Enforcement**: Secure transport layer
 
-### Session Management
-- Secure session configuration
-- CSRF protection implementation
-- Session timeout handling
+### Backend Security
+- **CORS Configuration**: Proper cross-origin policies
+- **Input Validation**: Multi-layer validation (client + server)
+- **SQL Injection Prevention**: Parameterized queries
+- **API Security**: Rate limiting and authentication headers
 
 ### Data Privacy
-- No permanent storage of sensitive data
-- Secure handling of API keys
-- Transport layer security enforcement
+- **Stateless Architecture**: No permanent user data storage
+- **Temporary File Cleanup**: Generated tearsheets cleaned up
+- **Environment Variables**: Secure API key management
+- **Session Isolation**: Independent user sessions
+
+## Deployment Architecture
+
+### Development Environment
+- **Dual Server Setup**: Frontend (3000) + Backend (5001)
+- **Hot Reloading**: Next.js dev server with Turbopack
+- **API Proxy**: Environment-based API URL configuration
+- **Debug Mode**: Enhanced logging and error reporting
+
+### Production Environment
+- **Container Deployment**: Docker containerization
+- **Reverse Proxy**: Nginx for static assets and routing
+- **Environment Separation**: Production-specific configurations
+- **Health Monitoring**: API health checks and monitoring
