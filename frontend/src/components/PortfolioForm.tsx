@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { PortfolioAPI } from '@/lib/api';
-import { PortfolioFormData, PortfolioAnalysisResponse } from '@/types/portfolio';
+import { PortfolioFormData } from '@/types/portfolio';
 
 // Validation schema using Zod
 const portfolioSchema = z.object({
@@ -28,8 +28,16 @@ const portfolioSchema = z.object({
 
 type PortfolioFormValues = z.infer<typeof portfolioSchema>;
 
+interface TearsheetResponse {
+  html: string;
+  portfolio_name: string;
+  symbols: string[];
+  period: string;
+  data_points: number;
+}
+
 interface PortfolioFormProps {
-  onAnalysisComplete: (data: PortfolioAnalysisResponse) => void;
+  onAnalysisComplete: (data: TearsheetResponse) => void;
 }
 
 export default function PortfolioForm({ onAnalysisComplete }: PortfolioFormProps) {
@@ -76,7 +84,7 @@ export default function PortfolioForm({ onAnalysisComplete }: PortfolioFormProps
         end_date: data.end_date,
         name: data.name,
       };
-      return PortfolioAPI.analyzePortfolio(formData);
+      return PortfolioAPI.generateTearsheet(formData);
     },
     onSuccess: (data) => {
       onAnalysisComplete(data);

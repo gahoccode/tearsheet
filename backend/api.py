@@ -15,10 +15,13 @@ from src.core.data_fetcher import DataFetcher
 from src.core.portfolio_analyzer import PortfolioAnalyzer
 from src.services.validation_service import ValidationService
 from src.services.vnstock_service import VnstockService
-from src.services.chart_data_service import ChartDataService
 from src.models.portfolio import Portfolio
 from src.utils.exceptions import ValidationError, DataFetchError, AnalysisError
 from src.utils.helpers import setup_logging
+
+# Import QuantStats for tearsheet generation
+import quantstats as qs
+import tempfile
 
 # Configure matplotlib
 matplotlib.use("Agg")  # Use non-GUI backend for server-side image generation
@@ -31,7 +34,6 @@ validation_service = ValidationService()
 data_fetcher = DataFetcher()
 portfolio_analyzer = PortfolioAnalyzer()
 vnstock_service = VnstockService()
-chart_data_service = ChartDataService()
 
 # Set up logging
 setup_logging(level="INFO")
@@ -49,6 +51,112 @@ CORS(app, origins=["http://localhost:3000"])
 def health_check():
     """Health check endpoint."""
     return jsonify({"status": "healthy", "service": "portfolio-api"})
+
+
+@app.route("/api/tearsheet", methods=["POST"])
+def generate_tearsheet():
+    """Generate QuantStats HTML tearsheet."""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No JSON data provided"}), 400
+
+        symbols = data.get("symbols", [])
+        weights = data.get("weights", [])
+        start_date = data.get("start_date", "").strip()
+        end_date = data.get("end_date", "").strip()
+        capital = data.get("capital", "")
+        portfolio_name = data.get("name", "Portfolio Analysis")
+
+        # Basic field validation
+        if not symbols or not weights or not start_date or not end_date or not capital:
+            return jsonify({"error": "All fields are required"}), 400
+
+        # Use validation service for comprehensive validation
+        try:
+            validated_data = validation_service.validate_portfolio_form(
+                symbols, [str(w) for w in weights], str(capital), start_date, end_date
+            )
+        except ValidationError as e:
+            return jsonify({"error": str(e)}), 400
+
+        # Create portfolio model
+        try:
+            portfolio = Portfolio.from_form_data(
+                symbols=validated_data["symbols"],
+                weights=[str(w) for w in validated_data["weights"]],
+                capital=str(validated_data["capital"]),
+                start_date=validated_data["start_date"],
+                end_date=validated_data["end_date"],
+                name=portfolio_name,
+            )
+        except ValidationError as e:
+            return jsonify({"error": f"Portfolio creation failed: {str(e)}"}), 400
+
+        # Fetch historical data
+        try:
+            historical_data = data_fetcher.fetch_historical_data(
+                portfolio.symbols, portfolio.start_date, portfolio.end_date
+            )
+            close_prices = data_fetcher.get_close_prices(
+                historical_data, portfolio.symbols
+            )
+        except DataFetchError as e:
+            return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
+
+        # Calculate portfolio returns
+        try:
+            portfolio_returns = portfolio_analyzer.calculate_portfolio_returns(
+                close_prices, portfolio.symbols, portfolio.weights
+            )
+        except AnalysisError as e:
+            return jsonify({"error": f"Analysis error: {str(e)}"}), 500
+
+        # Generate QuantStats HTML tearsheet
+        try:
+            # Create a temporary file to store the HTML
+            with tempfile.NamedTemporaryFile(mode='w+', suffix='.html', delete=False) as temp_file:
+                temp_file_path = temp_file.name
+            
+            # Generate the HTML tearsheet
+            qs.reports.html(
+                portfolio_returns,
+                benchmark=None,
+                rf=0.0,
+                grayscale=False,
+                title=portfolio_name,
+                output=temp_file_path,
+                compounded=True,
+                periods_per_year=252,
+                download_filename='tearsheet.html',
+                figfmt='svg',
+                template_path=None,
+                match_dates=True
+            )
+            
+            # Read the generated HTML content
+            with open(temp_file_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            
+            # Clean up the temporary file
+            os.unlink(temp_file_path)
+            
+            # Return the HTML content
+            return jsonify({
+                "html": html_content,
+                "portfolio_name": portfolio_name,
+                "symbols": portfolio.symbols,
+                "period": f"{portfolio.start_date} to {portfolio.end_date}",
+                "data_points": len(portfolio_returns)
+            })
+
+        except Exception as e:
+            return jsonify({"error": f"Error generating tearsheet: {str(e)}"}), 500
+
+    except (ValidationError, DataFetchError, AnalysisError) as e:
+        return jsonify({"error": str(e)}), 500
+    except Exception as ex:
+        return jsonify({"error": f"Unexpected error: {str(ex)}"}), 500
 
 
 @app.route("/api/analyze", methods=["POST"])
