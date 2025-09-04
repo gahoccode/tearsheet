@@ -28,9 +28,12 @@ tearsheet/
 
 ### 🎨 Modern Frontend
 - **Next.js 15**: App Router with Server Components and Turbopack
+- **React 19**: Latest React with improved performance
 - **TypeScript**: Full type safety throughout the application
-- **Tailwind CSS**: Utility-first responsive design
-- **React Query**: Advanced data fetching and state management
+- **TailwindCSS v4.0**: CSS-first configuration with @theme directive
+- **shadcn/ui**: Modern, accessible component library with black/white theme
+- **next-themes**: Seamless dark/light mode theme switching
+- **TanStack Query**: Advanced data fetching and state management
 - **React Hook Form + Zod**: Form handling with schema validation
 
 ### 🔧 Robust Backend

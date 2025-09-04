@@ -9,7 +9,7 @@ The Tearsheet Portfolio Analyzer is a modern **microservices-based** financial a
 ### Primary Functions
 - **Portfolio Analysis**: Generate comprehensive QuantStats HTML tearsheet reports with performance metrics
 - **Financial Ratio Analysis**: Analyze fundamental financial metrics for Vietnamese securities
-- **Modern UI**: React-based responsive interface with TypeScript and Tailwind CSS
+- **Modern UI**: React-based responsive interface with TypeScript, shadcn/ui components, and TailwindCSS v4.0
 - **Real-time Processing**: Instant portfolio analysis with live data fetching
 
 ### Target Users
@@ -64,10 +64,12 @@ C4Context
 - **Output**: Complete HTML reports with embedded charts and styling
 
 ### Next.js Frontend
-- **Technologies**: React 19, TypeScript, Tailwind CSS, TanStack Query
+- **Technologies**: React 19, TypeScript, TailwindCSS v4.0, shadcn/ui, TanStack Query, next-themes
+- **UI Framework**: shadcn/ui component library with black/white theme and dark mode support
+- **Styling**: TailwindCSS v4.0 CSS-first configuration with @theme directive
 - **Compatibility**: Modern browsers with JavaScript support
-- **Features**: Server-side rendering, automatic optimization, hot reloading
-- **Security**: Built-in XSS protection, CSP headers
+- **Features**: Server-side rendering, automatic optimization, hot reloading, theme switching
+- **Security**: Built-in XSS protection, CSP headers, accessible components
 
 ### Flask API Backend
 - **Technologies**: Python Flask, CORS-enabled, JSON-only responses

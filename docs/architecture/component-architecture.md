@@ -17,6 +17,9 @@ The Tearsheet Portfolio Analyzer follows a modern **microservices architecture**
 - **React Server Components**: Enhanced performance and SEO
 - **Client-Side State Management**: TanStack Query for API state
 - **TypeScript**: Full type safety throughout the frontend
+- **Component Library**: shadcn/ui for accessible, customizable UI components
+- **Theme System**: next-themes with TailwindCSS v4.0 CSS-first configuration
+- **Design System**: Black/white theme with dark/light mode support
 
 ### Backend Patterns (Flask)
 - **API-Only Design**: JSON-only endpoints with CORS support
@@ -96,9 +99,20 @@ C4Component
 
 ### React Components (`frontend/src/components/`)
 - **Core Components**:
-  - `PortfolioForm.tsx` - Portfolio input form with validation
-  - `QuantStatsTearsheet.tsx` - HTML tearsheet display
-  - UI components with TypeScript and Tailwind CSS
+  - `PortfolioForm.tsx` - Portfolio input form with shadcn/ui components and Zod validation
+  - `QuantStatsTearsheet.tsx` - HTML tearsheet display with shadcn/ui Card layout
+  - `MetricsDashboard.tsx` - Performance metrics display
+  - `theme-provider.tsx` - Next.js themes provider wrapper
+
+- **UI Component Library (`frontend/src/components/ui/`)**:
+  - `button.tsx` - shadcn/ui Button with multiple variants (default, secondary, destructive, outline, ghost, link)
+  - `input.tsx` - Form input components with focus states and error handling
+  - `label.tsx` - Accessible form labels with proper associations
+  - `card.tsx` - Container components (Card, CardHeader, CardTitle, CardContent, CardFooter)
+  - `select.tsx` - Form select inputs with consistent shadcn/ui styling
+  - `table.tsx` - Data display components (Table, TableHeader, TableBody, TableRow, TableHead, TableCell)
+  - `badge.tsx` - Status and tag display with variants
+  - `theme-toggle.tsx` - Dark/light mode toggle button with sun/moon icons
 
 ### API Client (`frontend/src/lib/api.ts`)
 - **Responsibilities**:

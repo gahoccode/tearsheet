@@ -1,0 +1,105 @@
+2025-09-04T07:58:37.468115Z  INFO tailwindcss_oxide::scanner: Provided sources:
+2025-09-04T07:58:37.468280Z  INFO tailwindcss_oxide::scanner: Source: PublicSourceEntry { base: "/Users/tamle/Projects/tearsheet/frontend", pattern: "**/*", negated: false }
+2025-09-04T07:58:37.468521Z  INFO tailwindcss_oxide::scanner: Optimized sources:
+2025-09-04T07:58:37.468527Z  INFO tailwindcss_oxide::scanner: Source: Auto { base: "/Users/tamle/Projects/tearsheet/frontend" }
+2025-09-04T07:58:37.470625Z  INFO scan_sources: tailwindcss_oxide::scanner: enter
+2025-09-04T07:58:37.472071Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/postcss.config.mjs"
+2025-09-04T07:58:37.472200Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/README.md"
+2025-09-04T07:58:37.472220Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/public"
+2025-09-04T07:58:37.472249Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/public/file.svg"
+2025-09-04T07:58:37.472263Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/public/vercel.svg"
+2025-09-04T07:58:37.472274Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/public/next.svg"
+2025-09-04T07:58:37.472285Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/public/globe.svg"
+2025-09-04T07:58:37.472296Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/public/window.svg"
+2025-09-04T07:58:37.472321Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/package.json"
+2025-09-04T07:58:37.472332Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/components.json"
+2025-09-04T07:58:37.472343Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/tsconfig.json"
+2025-09-04T07:58:37.472356Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/eslint.config.mjs"
+2025-09-04T07:58:37.472368Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/next.config.ts"
+2025-09-04T07:58:37.472385Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src"
+2025-09-04T07:58:37.472413Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/types"
+2025-09-04T07:58:37.472433Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/types/portfolio.ts"
+2025-09-04T07:58:37.472452Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/app"
+2025-09-04T07:58:37.472474Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/app/layout.tsx"
+2025-09-04T07:58:37.472491Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/app/ratios"
+2025-09-04T07:58:37.472513Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/app/ratios/page.tsx"
+2025-09-04T07:58:37.472524Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/app/page.tsx"
+2025-09-04T07:58:37.472534Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/app/globals.css"
+2025-09-04T07:58:37.472552Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components"
+2025-09-04T07:58:37.472576Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/theme-provider.tsx"
+2025-09-04T07:58:37.472597Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/ui"
+2025-09-04T07:58:37.472625Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/ui/card.tsx"
+2025-09-04T07:58:37.472634Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/ui/label.tsx"
+2025-09-04T07:58:37.472643Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/ui/badge.tsx"
+2025-09-04T07:58:37.472653Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/ui/button.tsx"
+2025-09-04T07:58:37.472661Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/ui/theme-toggle.tsx"
+2025-09-04T07:58:37.472671Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/ui/input.tsx"
+2025-09-04T07:58:37.472682Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/QuantStatsTearsheet.tsx"
+2025-09-04T07:58:37.472691Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/PortfolioForm.tsx"
+2025-09-04T07:58:37.472699Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/MetricsDashboard.tsx"
+2025-09-04T07:58:37.472807Z  INFO scan_sources: tailwindcss_oxide::scanner: exit
+2025-09-04T07:58:37.472812Z  INFO extract_candidates: tailwindcss_oxide::scanner: enter
+2025-09-04T07:58:37.472815Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: enter
+2025-09-04T07:58:37.472817Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: Reading 26 file(s)
+2025-09-04T07:58:37.472977Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/postcss.config.mjs"
+2025-09-04T07:58:37.472986Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/app/layout.tsx"
+2025-09-04T07:58:37.473059Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/tsconfig.json"
+2025-09-04T07:58:37.473100Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/public/file.svg"
+2025-09-04T07:58:37.473124Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/README.md"
+2025-09-04T07:58:37.473128Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/components/theme-provider.tsx"
+2025-09-04T07:58:37.473178Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/app/ratios/page.tsx"
+2025-09-04T07:58:37.473441Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/components/ui/input.tsx"
+2025-09-04T07:58:37.473558Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/public/window.svg"
+2025-09-04T07:58:37.473562Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/public/vercel.svg"
+2025-09-04T07:58:37.473574Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/package.json"
+2025-09-04T07:58:37.473575Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/eslint.config.mjs"
+2025-09-04T07:58:37.473598Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/next.config.ts"
+2025-09-04T07:58:37.473614Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/public/next.svg"
+2025-09-04T07:58:37.473634Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/components/ui/card.tsx"
+2025-09-04T07:58:37.473636Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/app/page.tsx"
+2025-09-04T07:58:37.473651Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/components/ui/badge.tsx"
+2025-09-04T07:58:37.473663Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/public/globe.svg"
+2025-09-04T07:58:37.473667Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/components/QuantStatsTearsheet.tsx"
+2025-09-04T07:58:37.473656Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/components/ui/button.tsx"
+2025-09-04T07:58:37.473688Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/components/ui/theme-toggle.tsx"
+2025-09-04T07:58:37.473726Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/components/PortfolioForm.tsx"
+2025-09-04T07:58:37.473726Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/components/ui/label.tsx"
+2025-09-04T07:58:37.473733Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/components.json"
+2025-09-04T07:58:37.473761Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/components/MetricsDashboard.tsx"
+2025-09-04T07:58:37.473842Z  INFO tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/types/portfolio.ts"
+2025-09-04T07:58:37.473872Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: exit
+2025-09-04T07:58:37.473878Z  INFO extract_candidates:parse_all_blobs: tailwindcss_oxide::scanner: enter
+2025-09-04T07:58:37.473881Z  INFO extract_candidates:parse_all_blobs:extract: tailwindcss_oxide::scanner: enter
+2025-09-04T07:58:37.474288Z  INFO extract_candidates:parse_all_blobs:extract: tailwindcss_oxide::scanner: exit
+2025-09-04T07:58:37.474294Z  INFO extract_candidates:parse_all_blobs: tailwindcss_oxide::scanner: exit
+2025-09-04T07:58:37.474298Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: enter
+2025-09-04T07:58:37.474300Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: Reading 1 file(s)
+2025-09-04T07:58:37.474315Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: Reading "/Users/tamle/Projects/tearsheet/frontend/src/app/globals.css"
+2025-09-04T07:58:37.474319Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: exit
+2025-09-04T07:58:37.474322Z  INFO extract_candidates:extract_css_variables: tailwindcss_oxide::scanner: enter
+2025-09-04T07:58:37.474325Z  INFO extract_candidates:extract_css_variables:extract: tailwindcss_oxide::scanner: enter
+2025-09-04T07:58:37.474387Z  INFO extract_candidates:extract_css_variables:extract: tailwindcss_oxide::scanner: exit
+2025-09-04T07:58:37.474393Z  INFO extract_candidates:extract_css_variables: tailwindcss_oxide::scanner: exit
+2025-09-04T07:58:37.474524Z  INFO extract_candidates: tailwindcss_oxide::scanner: exit
+2025-09-04T07:58:37.474740Z  INFO get_files: tailwindcss_oxide::scanner: enter
+2025-09-04T07:58:37.474744Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: enter
+2025-09-04T07:58:37.475436Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/public"
+2025-09-04T07:58:37.475523Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src"
+2025-09-04T07:58:37.475547Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/types"
+2025-09-04T07:58:37.475575Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/app"
+2025-09-04T07:58:37.475605Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/app/ratios"
+2025-09-04T07:58:37.475641Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components"
+2025-09-04T07:58:37.475669Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/ui"
+2025-09-04T07:58:37.475789Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: exit
+2025-09-04T07:58:37.475841Z  INFO get_files: tailwindcss_oxide::scanner: exit
+2025-09-04T07:58:37.475947Z  INFO get_globs: tailwindcss_oxide::scanner: enter
+2025-09-04T07:58:37.475955Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: enter
+2025-09-04T07:58:37.476653Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/public"
+2025-09-04T07:58:37.476745Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src"
+2025-09-04T07:58:37.476770Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/types"
+2025-09-04T07:58:37.476800Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/app"
+2025-09-04T07:58:37.476834Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/app/ratios"
+2025-09-04T07:58:37.476872Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components"
+2025-09-04T07:58:37.476929Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: Discovering "/Users/tamle/Projects/tearsheet/frontend/src/components/ui"
+2025-09-04T07:58:37.477074Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: exit
+2025-09-04T07:58:37.478344Z  INFO get_globs: tailwindcss_oxide::scanner: exit

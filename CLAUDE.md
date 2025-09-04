@@ -96,6 +96,8 @@ tearsheet/
 - **React 19**: Latest React with improved performance
 - **TypeScript**: Type safety and development experience
 - **Tailwind CSS 4**: Utility-first CSS framework
+- **shadcn/ui**: Modern component library with black/white theme
+- **next-themes**: Theme switching and dark mode support
 - **TanStack Query**: Data fetching, caching, and state management
 - **React Hook Form**: Form handling with performance optimization
 - **Zod**: TypeScript-first schema validation
@@ -198,3 +200,36 @@ NEXT_PUBLIC_API_TIMEOUT=30000
 - **Environment Variables**: Proper environment configuration prevents CORS and connectivity issues
 - **Testing Strategy**: Test both individual services and full stack integration
 - **Documentation**: Keep architecture documentation updated with implementation changes
+
+### shadcn/ui Integration with TailwindCSS v4.0
+
+#### TailwindCSS v4.0 CSS-First Configuration
+- **Configuration approach**: Uses CSS-first configuration with `@theme` directive in `globals.css`
+- **No JavaScript config**: TailwindCSS v4.0 eliminates the need for `tailwind.config.js/ts` files
+- **Built-in PostCSS**: Uses `@tailwindcss/postcss` plugin in `postcss.config.mjs`
+- **CSS Variables**: Theme tokens defined directly in CSS using `--color-*` naming convention
+
+#### Installation Commands
+- **Manual shadcn/ui setup**: Install dependencies manually since CLI has compatibility issues with TailwindCSS v4.0
+- **Core dependencies**: `npm install @radix-ui/react-label @radix-ui/react-slot class-variance-authority next-themes lucide-react`
+- **Component creation**: Create components manually using shadcn/ui patterns
+
+#### Component Setup
+- **Utils file**: `src/lib/utils.ts` - Contains `cn()` utility for class merging with clsx/tailwind-merge
+- **Components directory**: `src/components/ui/` - Houses manually created shadcn/ui components
+- **Theme configuration**: 
+  - Uses TailwindCSS v4.0 `@theme` directive for CSS variables
+  - Class-based dark mode with `.dark` selector for next-themes compatibility
+  - Black/white theme with proper contrast ratios
+- **Theme Provider**: `next-themes` for seamless dark/light mode switching
+
+#### TailwindCSS v4.0 Specific Considerations
+- **CSS Variable Format**: Use `--color-*` format instead of plain variable names
+- **Dark Mode**: Use `.dark` class selector instead of `@media (prefers-color-scheme: dark)`
+- **No JavaScript Config**: All configuration happens in CSS using `@theme` blocks
+
+#### Common TypeScript Issues and Fixes
+- **Table component types**: Use `React.HTMLAttributes<HTMLTableCellElement>` for TableHead, not `React.ThHTMLAttributes` (which doesn't exist)
+- **Select component**: Use standard `React.SelectHTMLAttributes<HTMLSelectElement>` interface
+- **Component refs**: Always use proper HTML element types for forwardRef components
+- **Built-in Features**: Container queries, nesting, and modern CSS features included by default

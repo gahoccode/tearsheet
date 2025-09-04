@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **shadcn/ui Integration**: Modern, accessible UI components with black/white theme
+- **TailwindCSS v4.0**: CSS-first configuration using @theme directive
+- **Dark/Light Theme Toggle**: Seamless theme switching with next-themes
+- **TypeScript Component Types**: Proper type definitions for all UI components
+
+### Changed
+- **UI Framework**: Complete transformation to shadcn/ui component system
+- **Theme Configuration**: Migrated to TailwindCSS v4.0 CSS-first approach
+- **Component Architecture**: All forms, tables, and UI elements now use shadcn/ui patterns
+- **Ratios Page**: Full shadcn/ui transformation with proper TypeScript types
+
+### Fixed
+- **TypeScript Errors**: Resolved table component type definition issues
+- **TailwindCSS Configuration**: Fixed v3/v4 configuration conflicts
+- **Component Compatibility**: Ensured all components work with TailwindCSS v4.0
+
+### Documentation
+- **CLAUDE.md Updates**: Added TailwindCSS v4.0 integration guide and common TypeScript fixes
+
 ## [2.1.0] - 2025-01-04
 ### Changed
 - **Visualization Approach**: Replaced complex Plotly.js charts with simple QuantStats HTML tearsheet rendering

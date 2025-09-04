@@ -3,13 +3,28 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PortfolioAPI } from '@/lib/api';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select } from '@/components/ui/select';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Loader2 } from 'lucide-react';
 
-interface RatioData {
-  symbol: string;
-  period: string;
-  data: Record<string, any>[];
+interface RatioRowData {
+  [key: string]: string | number | null;
+}
+
+interface SymbolRatioData {
+  data: RatioRowData[];
   columns: string[];
-  rows: number;
+}
+
+interface RatiosResponse {
+  symbols?: string[];
+  ratio_data: Record<string, SymbolRatioData>;
+  summary_data: RatioRowData[];
 }
 
 export default function RatiosPage() {
@@ -17,7 +32,7 @@ export default function RatiosPage() {
   const [period, setPeriod] = useState('year');
   const [submittedSymbols, setSubmittedSymbols] = useState<string>('');
 
-  const { data: ratiosData, isLoading, error, refetch } = useQuery({
+  const { data: ratiosData, isLoading, error } = useQuery<RatiosResponse | null>({
     queryKey: ['ratios', submittedSymbols, period],
     queryFn: async () => {
       if (!submittedSymbols) return null;
@@ -43,210 +58,212 @@ export default function RatiosPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {!submittedSymbols || !ratiosData ? (
           // Input Form
           <div className="space-y-8">
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              <h1 className="text-3xl font-bold mb-4">
                 Financial Ratios Analysis
               </h1>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 Analyze financial ratios for Vietnamese stocks including P/E, P/B, ROE, ROA, and more.
               </p>
             </div>
 
             <div className="max-w-2xl mx-auto">
-              <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg space-y-6">
-                <div>
-                  <label htmlFor="symbols" className="block text-sm font-medium text-gray-700 mb-2">
-                    Stock Symbols
-                  </label>
-                  <input
-                    type="text"
-                    id="symbols"
-                    value={symbols}
-                    onChange={(e) => setSymbols(e.target.value)}
-                    placeholder="Enter stock symbols separated by commas (e.g., VNM, VIC, FPT)"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                  <p className="mt-1 text-sm text-gray-500">
-                    Enter Vietnamese stock symbols separated by commas
-                  </p>
-                </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Stock Analysis</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="symbols">
+                        Stock Symbols
+                      </Label>
+                      <Input
+                        type="text"
+                        id="symbols"
+                        value={symbols}
+                        onChange={(e) => setSymbols(e.target.value)}
+                        placeholder="Enter stock symbols separated by commas (e.g., VNM, VIC, FPT)"
+                        required
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        Enter Vietnamese stock symbols separated by commas
+                      </p>
+                    </div>
 
-                <div>
-                  <label htmlFor="period" className="block text-sm font-medium text-gray-700 mb-2">
-                    Period
-                  </label>
-                  <select
-                    id="period"
-                    value={period}
-                    onChange={(e) => setPeriod(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="year">Annual</option>
-                    <option value="quarter">Quarterly</option>
-                  </select>
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="period">
+                        Period
+                      </Label>
+                      <Select
+                        id="period"
+                        value={period}
+                        onChange={(e) => setPeriod(e.target.value)}
+                      >
+                        <option value="year">Annual</option>
+                        <option value="quarter">Quarterly</option>
+                      </Select>
+                    </div>
 
-                <button
-                  type="submit"
-                  disabled={isLoading || !symbols.trim()}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? 'Analyzing...' : 'Analyze Ratios'}
-                </button>
-              </form>
+                    <Button
+                      type="submit"
+                      disabled={isLoading || !symbols.trim()}
+                      className="w-full"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Analyzing...
+                        </>
+                      ) : (
+                        'Analyze Ratios'
+                      )}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
             </div>
           </div>
         ) : (
           // Results
           <div className="space-y-8">
             {/* Header */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    Financial Ratios Analysis
-                  </h1>
-                  <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-600">
-                    <span>
-                      <strong>Symbols:</strong> {ratiosData?.symbols?.join(', ') || submittedSymbols}
-                    </span>
-                    <span>
-                      <strong>Period:</strong> {period === 'year' ? 'Annual' : 'Quarterly'}
-                    </span>
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl">
+                      Financial Ratios Analysis
+                    </CardTitle>
+                    <div className="mt-2 flex flex-wrap gap-2 text-sm text-muted-foreground">
+                      <div className="flex flex-wrap gap-1">
+                        <span className="font-medium">Symbols:</span>
+                        {(ratiosData?.symbols || submittedSymbols.split(',').map(s => s.trim())).map((symbol: string) => (
+                          <Badge key={symbol} variant="secondary">{symbol}</Badge>
+                        ))}
+                      </div>
+                      <Badge variant="outline">
+                        Period: {period === 'year' ? 'Annual' : 'Quarterly'}
+                      </Badge>
+                    </div>
                   </div>
+                  <Button onClick={handleNewAnalysis}>
+                    New Analysis
+                  </Button>
                 </div>
-                <button
-                  onClick={handleNewAnalysis}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                >
-                  New Analysis
-                </button>
-              </div>
-            </div>
+              </CardHeader>
+            </Card>
 
             {/* Error Display */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <div className="flex">
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">
-                      Analysis Error
-                    </h3>
-                    <div className="mt-2 text-sm text-red-700">
-                      {error instanceof Error ? error.message : 'An error occurred while fetching ratio data'}
-                    </div>
+              <Card className="border-destructive bg-destructive/10">
+                <CardContent className="p-4">
+                  <h3 className="text-sm font-medium text-destructive">
+                    Analysis Error
+                  </h3>
+                  <div className="mt-2 text-sm text-destructive">
+                    {error instanceof Error ? error.message : 'An error occurred while fetching ratio data'}
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* Loading State */}
             {isLoading && (
-              <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <p className="mt-2 text-gray-600">Fetching financial ratios...</p>
-              </div>
+              <Card className="p-8 text-center">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+                <p className="mt-2 text-muted-foreground">Fetching financial ratios...</p>
+              </Card>
             )}
 
             {/* Ratios Data */}
             {ratiosData && ratiosData.ratio_data && (
               <div className="space-y-6">
-                {Object.entries(ratiosData.ratio_data).map(([symbol, data]: [string, any]) => (
-                  <div key={symbol} className="bg-white rounded-lg shadow-lg p-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                      {symbol} - Financial Ratios
-                    </h2>
-                    
-                    {data.data && data.data.length > 0 ? (
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
+                {Object.entries(ratiosData.ratio_data).map(([symbol, data]) => (
+                  <Card key={symbol}>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Badge variant="default">{symbol}</Badge>
+                        <span>Financial Ratios</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {data.data && data.data.length > 0 ? (
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
                               {data.columns.map((column: string) => (
-                                <th
-                                  key={column}
-                                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
+                                <TableHead key={column}>
                                   {column}
-                                </th>
+                                </TableHead>
                               ))}
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
-                            {data.data.map((row: any, idx: number) => (
-                              <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {data.data.map((row, idx) => (
+                              <TableRow key={idx}>
                                 {data.columns.map((column: string) => (
-                                  <td
-                                    key={column}
-                                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                  >
+                                  <TableCell key={column}>
                                     {typeof row[column] === 'number' 
                                       ? row[column].toLocaleString()
                                       : row[column] || '-'
                                     }
-                                  </td>
+                                  </TableCell>
                                 ))}
-                              </tr>
+                              </TableRow>
                             ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8">
-                        <p className="text-gray-500">No ratio data available for {symbol}</p>
-                      </div>
-                    )}
-                  </div>
+                          </TableBody>
+                        </Table>
+                      ) : (
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground">No ratio data available for {symbol}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             )}
 
             {/* Summary Data */}
             {ratiosData && ratiosData.summary_data && ratiosData.summary_data.length > 0 && (
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  Fundamental Summary
-                </h2>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Fundamental Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
                         {Object.keys(ratiosData.summary_data[0]).map((key) => (
-                          <th
-                            key={key}
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
+                          <TableHead key={key}>
                             {key}
-                          </th>
+                          </TableHead>
                         ))}
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {ratiosData.summary_data.map((row: any, idx: number) => (
-                        <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                          {Object.values(row).map((value: any, colIdx: number) => (
-                            <td
-                              key={colIdx}
-                              className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                            >
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {ratiosData.summary_data.map((row, idx) => (
+                        <TableRow key={idx}>
+                          {Object.values(row).map((value, colIdx) => (
+                            <TableCell key={colIdx}>
                               {typeof value === 'number' 
                                 ? value.toLocaleString()
                                 : value || '-'
                               }
-                            </td>
+                            </TableCell>
                           ))}
-                        </tr>
+                        </TableRow>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
             )}
           </div>
         )}

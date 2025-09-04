@@ -7,6 +7,11 @@ import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { PortfolioAPI } from '@/lib/api';
 import { PortfolioFormData } from '@/types/portfolio';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 
 // Validation schema using Zod
 const portfolioSchema = z.object({
@@ -115,71 +120,67 @@ export default function PortfolioForm({ onAnalysisComplete }: PortfolioFormProps
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Portfolio Analysis</h2>
-        <p className="text-gray-600">
+    <Card className="max-w-4xl mx-auto">
+      <CardHeader>
+        <CardTitle className="text-2xl">Portfolio Analysis</CardTitle>
+        <CardDescription>
           Analyze your Vietnamese stock portfolio with interactive visualizations
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Portfolio Name */}
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label htmlFor="name">
             Portfolio Name (Optional)
-          </label>
-          <input
+          </Label>
+          <Input
             {...register('name')}
             type="text"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="My Portfolio"
           />
         </div>
 
         {/* Capital */}
-        <div>
-          <label htmlFor="capital" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label htmlFor="capital">
             Initial Capital (VND)
-          </label>
-          <input
+          </Label>
+          <Input
             {...register('capital', { valueAsNumber: true })}
             type="number"
             step="1000000"
             min="1000000"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           {errors.capital && (
-            <p className="mt-1 text-sm text-red-600">{errors.capital.message}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.capital.message}</p>
           )}
         </div>
 
         {/* Date Range */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="space-y-2">
+            <Label htmlFor="start_date">
               Start Date
-            </label>
-            <input
+            </Label>
+            <Input
               {...register('start_date')}
               type="date"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             {errors.start_date && (
-              <p className="mt-1 text-sm text-red-600">{errors.start_date.message}</p>
+              <p className="mt-1 text-sm text-destructive">{errors.start_date.message}</p>
             )}
           </div>
-          <div>
-            <label htmlFor="end_date" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="space-y-2">
+            <Label htmlFor="end_date">
               End Date
-            </label>
-            <input
+            </Label>
+            <Input
               {...register('end_date')}
               type="date"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             {errors.end_date && (
-              <p className="mt-1 text-sm text-red-600">{errors.end_date.message}</p>
+              <p className="mt-1 text-sm text-destructive">{errors.end_date.message}</p>
             )}
           </div>
         </div>
@@ -187,111 +188,115 @@ export default function PortfolioForm({ onAnalysisComplete }: PortfolioFormProps
         {/* Stocks */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">Portfolio Composition</h3>
-            <button
+            <h3 className="text-lg font-medium">Portfolio Composition</h3>
+            <Button
               type="button"
               onClick={addStock}
               disabled={fields.length >= 10}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              variant="outline"
             >
               Add Stock
-            </button>
+            </Button>
           </div>
 
           <div className="space-y-4">
             {fields.map((field, index) => (
-              <div key={field.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-md">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Symbol
-                  </label>
-                  <input
-                    {...register(`stocks.${index}.symbol`)}
-                    type="text"
-                    placeholder="REE"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  {errors.stocks?.[index]?.symbol && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.stocks[index]?.symbol?.message}
-                    </p>
-                  )}
-                </div>
+              <Card key={field.id} className="p-4">
+                <div className="flex items-center space-x-4">
+                  <div className="flex-1 space-y-2">
+                    <Label htmlFor={`stocks.${index}.symbol`}>
+                      Symbol
+                    </Label>
+                    <Input
+                      {...register(`stocks.${index}.symbol`)}
+                      type="text"
+                      placeholder="REE"
+                    />
+                    {errors.stocks?.[index]?.symbol && (
+                      <p className="mt-1 text-sm text-destructive">
+                        {errors.stocks[index]?.symbol?.message}
+                      </p>
+                    )}
+                  </div>
 
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Weight (%)
-                  </label>
-                  <input
-                    {...register(`stocks.${index}.weight`, { valueAsNumber: true })}
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    max="1"
-                    placeholder="0.40"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  {errors.stocks?.[index]?.weight && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.stocks[index]?.weight?.message}
-                    </p>
-                  )}
-                </div>
+                  <div className="flex-1 space-y-2">
+                    <Label htmlFor={`stocks.${index}.weight`}>
+                      Weight (%)
+                    </Label>
+                    <Input
+                      {...register(`stocks.${index}.weight`, { valueAsNumber: true })}
+                      type="number"
+                      step="0.01"
+                      min="0.01"
+                      max="1"
+                      placeholder="0.40"
+                    />
+                    {errors.stocks?.[index]?.weight && (
+                      <p className="mt-1 text-sm text-destructive">
+                        {errors.stocks[index]?.weight?.message}
+                      </p>
+                    )}
+                  </div>
 
-                <button
-                  type="button"
-                  onClick={() => removeStock(index)}
-                  disabled={fields.length <= 1}
-                  className="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed mt-6"
-                >
-                  Remove
-                </button>
-              </div>
+                  <Button
+                    type="button"
+                    onClick={() => removeStock(index)}
+                    disabled={fields.length <= 1}
+                    variant="destructive"
+                    size="sm"
+                    className="mt-6"
+                  >
+                    Remove
+                  </Button>
+                </div>
+              </Card>
             ))}
           </div>
 
           {/* Weight Summary */}
-          <div className="mt-4 p-3 bg-blue-50 rounded-md">
-            <p className="text-sm text-blue-800">
+          <Card className="mt-4 p-3 bg-muted">
+            <p className="text-sm">
               Total Weight: {(totalWeight * 100).toFixed(2)}%
               {Math.abs(totalWeight - 1) > 0.01 && (
-                <span className="ml-2 text-red-600">
+                <span className="ml-2 text-destructive">
                   (Must equal 100%)
                 </span>
               )}
             </p>
-          </div>
+          </Card>
 
           {errors.stocks && typeof errors.stocks.message === 'string' && (
-            <p className="mt-1 text-sm text-red-600">{errors.stocks.message}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.stocks.message}</p>
           )}
         </div>
 
         {/* Submit Button */}
         <div className="pt-4">
-          <button
+          <Button
             type="submit"
             disabled={isAnalyzing || Math.abs(totalWeight - 1) > 0.01}
-            className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full"
+            size="lg"
           >
             {isAnalyzing ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Analyzing Portfolio...
-              </div>
+              </>
             ) : (
               'Analyze Portfolio'
             )}
-          </button>
+          </Button>
         </div>
 
         {/* Error Messages */}
         {errors.root && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-800">{errors.root.message}</p>
-          </div>
+          <Card className="p-4 border-destructive bg-destructive/10">
+            <p className="text-sm text-destructive">{errors.root.message}</p>
+          </Card>
         )}
       </form>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
