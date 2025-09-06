@@ -11,31 +11,68 @@
 <body>
     <div class="qs-container">
         <h1 class="qs-mb-4">Portfolio Analysis Results</h1>
+        
+        <!-- Navigation -->
+        <div class="qs-mb-4">
+            <a href="/" class="qs-btn qs-btn-secondary">← New Analysis</a>
+            <a href="/static/reports/quantstats-results.html" target="_blank" class="qs-btn qs-btn-primary" style="margin-left: 10px;">View Full Report</a>
+        </div>
+
+        <!-- Portfolio Info -->
+        {% if portfolio_symbols and portfolio_weights %}
+        <div class="qs-mb-4">
+            <h2>Portfolio Composition</h2>
+            <div class="qs-row">
+                {% for i in range(portfolio_symbols|length) %}
+                <div class="qs-col">
+                    <div style="background: #f5f6fa; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 8px;">
+                        <h4 style="margin: 0; color: #1a237e;">{{ portfolio_symbols[i] }}</h4>
+                        <p style="margin: 4px 0 0 0; color: #666;">{{ (portfolio_weights[i]|float * 100)|round(1) }}%</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="qs-row">
+                <div class="qs-col">
+                    <div style="background: #f5f6fa; padding: 12px; border-radius: 6px; text-align: center;">
+                        <h4 style="margin: 0; color: #1a237e;">{{ start_date }} to {{ end_date }}</h4>
+                        <p style="margin: 4px 0 0 0; color: #666;">Analysis Period</p>
+                    </div>
+                </div>
+                <div class="qs-col">
+                    <div style="background: #f5f6fa; padding: 12px; border-radius: 6px; text-align: center;">
+                        <h4 style="margin: 0; color: #1a237e;">{{ "{:,.0f}".format(capital) }} VND</h4>
+                        <p style="margin: 4px 0 0 0; color: #666;">Initial Capital</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- QuantStats Static Images -->
-        {% if summary_img or monthly_img or drawdown_img %}
+        {% if summary_chart_url or monthly_chart_url or drawdown_chart_url %}
         <div class="qs-mb-4">
             <h2>QuantStats Portfolio Visuals</h2>
-            {% if summary_img %}
+            {% if summary_chart_url %}
             <div class="qs-mb-3">
                 <h5>Summary Snapshot</h5>
-                <img src="data:image/png;base64,{{ summary_img }}" alt="Portfolio Summary" class="qs-img">
+                <img src="{{ summary_chart_url }}" alt="Portfolio Summary" class="qs-img">
             </div>
             {% endif %}
-            {% if monthly_img %}
+            {% if monthly_chart_url %}
             <div class="qs-mb-3">
                 <h5>Monthly Returns Heatmap</h5>
-                <img src="data:image/png;base64,{{ monthly_img }}" alt="Monthly Heatmap" class="qs-img">
+                <img src="{{ monthly_chart_url }}" alt="Monthly Heatmap" class="qs-img">
             </div>
             {% endif %}
-            {% if drawdown_img %}
+            {% if drawdown_chart_url %}
             <div class="qs-mb-3">
                 <h5>Drawdown</h5>
-                <img src="data:image/png;base64,{{ drawdown_img }}" alt="Drawdown" class="qs-img">
+                <img src="{{ drawdown_chart_url }}" alt="Drawdown" class="qs-img">
             </div>
             {% endif %}
         </div>
         {% endif %}
-        <a href="/" class="qs-btn qs-btn-secondary">Back</a>
     </div>
     <script src="/static/js/script.js"></script>
 </body>

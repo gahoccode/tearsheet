@@ -1,0 +1,14 @@
+{
+  "preset": "angular",
+  "releaseCommitMessageFormat": "chore(release): {{currentTag}}",
+  "outputFile": "CHANGELOG.md",
+  "pkg": {
+    "transform": {
+      "version": "{{version}}"
+    }
+  },
+  "conventionalChangelog": {
+    "preset": "angular",
+    "releaseCount": 0
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "quantstatswebapp",
+  "version": "2.0.0",
+  "description": "Modern web application for Vietnam stock portfolio analysis",
+  "private": true,
+  "scripts": {
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "changelog:all": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
+    "version": "npm run changelog && git add CHANGELOG.md",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "python app.py",
+    "build": "cd frontend && npm run build",
+    "start": "python app.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/tearsheet.git"
+  },
+  "keywords": [
+    "portfolio-analysis",
+    "quantstats",
+    "vietnam-stocks",
+    "flask",
+    "react",
+    "vite",
+    "antd"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "conventional-changelog-cli": "^4.1.0"
+  }
+}

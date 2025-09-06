@@ -1,0 +1,22 @@
+.app {
+  min-height: 100vh;
+}
+
+/* Custom styles for better visual hierarchy */
+.ant-card {
+  box-shadow: 0 2px 16px rgba(30, 40, 90, 0.07);
+}
+
+.ant-statistic-title {
+  font-weight: 600;
+}
+
+/* Ensure images are responsive */
+.ant-image {
+  width: 100%;
+}
+
+/* Better spacing for form items */
+.ant-form-item {
+  margin-bottom: 16px;
+}

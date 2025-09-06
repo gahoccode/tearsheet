@@ -4,7 +4,8 @@ Flask backend for QuantstatsWebApp.
 Implements '/' and '/analyze' routes per PRD.
 """
 
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask_cors import CORS
 from data_loader import fetch_historical_data, get_close_prices, DataLoaderError
 import pandas as pd
 import os
@@ -18,13 +19,23 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:5173"])  # Vite dev server
 app.secret_key = os.environ.get('SECRET_KEY')
 if not app.secret_key:
     raise ValueError("SECRET_KEY environment variable must be set")
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    # Check if React build exists, serve it; otherwise fallback to Flask template
+    react_build_path = os.path.join(app.static_folder, 'react-build', 'index.html')
+    if os.path.exists(react_build_path):
+        return app.send_static_file('react-build/index.html')
+    else:
+        return render_template('index.html')
+
+@app.route('/assets/<path:filename>')
+def react_assets(filename):
+    return app.send_static_file(f'react-build/assets/{filename}')
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
@@ -90,28 +101,26 @@ def analyze():
         # Unique prefix for this analysis
         unique_id = uuid.uuid4().hex[:8]
 
-        # Generate QuantStats summary snapshot
+        # Create charts directory for this session
+        charts_dir = os.path.join(static_dir, 'charts')
+        os.makedirs(charts_dir, exist_ok=True)
+        
+        # Generate QuantStats summary snapshot and save as file
         fig = qs.plots.snapshot(portfolio_returns, show=False)
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png', bbox_inches='tight')
-        buf.seek(0)
-        summary_img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        summary_chart_path = os.path.join(charts_dir, f'{unique_id}_summary.png')
+        fig.savefig(summary_chart_path, format='png', bbox_inches='tight', dpi=150)
         plt.close(fig)
 
-        # Generate QuantStats monthly returns heatmap
+        # Generate QuantStats monthly returns heatmap and save as file
         fig = qs.plots.monthly_heatmap(portfolio_returns, show=False)
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png', bbox_inches='tight')
-        buf.seek(0)
-        monthly_img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        monthly_chart_path = os.path.join(charts_dir, f'{unique_id}_monthly.png')
+        fig.savefig(monthly_chart_path, format='png', bbox_inches='tight', dpi=150)
         plt.close(fig)
 
-        # Generate QuantStats drawdown plot
+        # Generate QuantStats drawdown plot and save as file
         fig = qs.plots.drawdown(portfolio_returns, show=False)
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png', bbox_inches='tight')
-        buf.seek(0)
-        drawdown_img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        drawdown_chart_path = os.path.join(charts_dir, f'{unique_id}_drawdown.png')
+        fig.savefig(drawdown_chart_path, format='png', bbox_inches='tight', dpi=150)
         plt.close(fig)
 
         # Generate QuantStats HTML report
@@ -136,8 +145,25 @@ def analyze():
         except Exception as report_ex:
             flash(f'Failed to generate QuantStats HTML report: {report_ex}')
             return render_template('index.html'), 200
-        # Redirect to the generated HTML report
-        return redirect(url_for('static', filename='reports/quantstats-results.html'))
+        # Store results in session with file URLs instead of base64 data
+        results_data = {
+            'summary_chart_url': f'/static/charts/{unique_id}_summary.png',
+            'monthly_chart_url': f'/static/charts/{unique_id}_monthly.png',
+            'drawdown_chart_url': f'/static/charts/{unique_id}_drawdown.png',
+            'portfolio_symbols': symbols,
+            'portfolio_weights': weights,
+            'start_date': start_date,
+            'end_date': end_date,
+            'capital': capital_float,
+            'unique_id': unique_id
+        }
+        session['analysis_results'] = results_data
+        
+        # Check if request wants JSON response (from React)
+        if request.headers.get('Accept') == 'application/json':
+            return jsonify({'success': True, 'redirect': '/results'})
+        else:
+            return redirect(url_for('results'))
     except DataLoaderError as e:
         flash(f"Error fetching data: {str(e)}")
         return render_template('index.html'), 200
@@ -145,7 +171,45 @@ def analyze():
         flash(f'Unexpected error: {ex}')
         return render_template('index.html'), 200
 
+@app.route('/results', methods=['GET'])
+def results():
+    # Get analysis results from session
+    analysis_results = session.get('analysis_results')
+    if not analysis_results:
+        # Check if request is JSON (from React)
+        if request.headers.get('Accept') == 'application/json' or request.is_json:
+            return jsonify({'error': 'No analysis results found. Please run an analysis first.'}), 400
+        else:
+            flash('No analysis results found. Please run an analysis first.')
+            return redirect(url_for('index'))
+    
+    # Check if request wants JSON (from React)
+    if request.headers.get('Accept') == 'application/json' or request.is_json:
+        return jsonify(analysis_results)
+    else:
+        # Return HTML template for traditional requests
+        return render_template('results.html', 
+                             summary_chart_url=analysis_results.get('summary_chart_url'),
+                             monthly_chart_url=analysis_results.get('monthly_chart_url'), 
+                             drawdown_chart_url=analysis_results.get('drawdown_chart_url'),
+                             portfolio_symbols=analysis_results.get('portfolio_symbols'),
+                             portfolio_weights=analysis_results.get('portfolio_weights'),
+                             start_date=analysis_results.get('start_date'),
+                             end_date=analysis_results.get('end_date'),
+                             capital=analysis_results.get('capital'))
+
+# Catch-all route for React Router (client-side routing)
+@app.route('/<path:path>')
+def react_routes(path):
+    # Only serve React app for non-API routes
+    if not path.startswith('api/') and not path.startswith('static/'):
+        react_build_path = os.path.join(app.static_folder, 'react-build', 'index.html')
+        if os.path.exists(react_build_path):
+            return app.send_static_file('react-build/index.html')
+    # For other routes, return 404
+    return 'Not found', 404
+
 if __name__ == "__main__":
     import os
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 5001))
     app.run(host="0.0.0.0", port=port, debug=True)

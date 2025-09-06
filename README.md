@@ -1,54 +1,83 @@
 # QuantstatsWebApp
 
-A Python web application for Vietnam stock portfolio analysis using Flask, vnstock, and quantstats.
+A modern web application for Vietnam stock portfolio analysis featuring a React frontend with Ant Design and Flask backend using vnstock and quantstats.
 
 ## Features
-- Fetches historical price data for user-selected Vietnam stock tickers using vnstock
-- Simulates portfolio performance and computes key metrics (returns, Sharpe, drawdown, etc.)
-- Generates interactive charts and downloadable QuantStats HTML tear sheet
-- Responsive Bootstrap UI
-- **/analyze** route generates a QuantStats HTML report and redirects users to `/static/reports/quantstats-results.html` for a full tear sheet
-- "Back to Home" navigation is recommended for user-friendly return to the main page
-- Integrated tests verify routing, HTML file creation, and Matplotlib backend
+- **Modern React UI**: Built with Vite, React Router, and Ant Design components
+- **Dual Interface**: Both modern React SPA and legacy HTML templates supported
+- **Real-time Analysis**: Fetches historical price data for Vietnam stock tickers using vnstock
+- **Interactive Results**: Displays portfolio performance metrics, charts, and downloadable QuantStats HTML tearsheet
+- **Responsive Design**: Mobile-first design with Ant Design's responsive grid system
+- **Form Validation**: Client-side and server-side validation for portfolio inputs
+- **Session Management**: Results stored in Flask sessions for seamless user experience
 
 ## Project Structure
-- app.py: Flask backend (**implemented**)
-- data_loader.py: Data loader for historical prices (**implemented**)
-- templates/: HTML templates (**implemented**)
-- static/: CSS and JS (**implemented**)
-- tests/: Unit and integration tests (**implemented**)
+- **app.py**: Flask backend with JSON API and HTML template support
+- **frontend/**: Vite React application with Ant Design components
+  - **src/components/**: React components (PortfolioForm, ResultsPage)
+  - **src/App.jsx**: Main app with routing configuration
+- **data_loader.py**: Data fetching module for Vietnam stock data
+- **templates/**: Legacy HTML templates (Flask/Jinja2)
+- **static/**: Static assets, CSS, JS, generated reports, and React build output
+- **tests/**: Unit and integration tests
 
 ## Setup Instructions
 
-### 1. Create and activate a virtual environment (Windows, Command Prompt)
+### Backend Setup
 
-```cmd
+1. **Create and activate a virtual environment**
+```bash
 python -m venv venv
-venv\Scripts\activate
+source venv/bin/activate  # macOS/Linux
+# or
+venv\Scripts\activate     # Windows
 ```
 
-### 2. Install dependencies
-
-```cmd
-pip install -r requirements.txt
-```
-
-Alternatively, using uv:
-
-```cmd
+2. **Install Python dependencies**
+```bash
 pip install uv
 uv pip install --all --upgrade --refresh
 ```
 
-### 3. Run the app
-
-```cmd
-python app.py
+3. **Set environment variables**
+```bash
+export SECRET_KEY=your-secret-key-here
 ```
 
-The app will be available at http://127.0.0.1:5000
+### Frontend Setup
 
-After analyzing a portfolio, you will be redirected to a full QuantStats HTML report (tear sheet) at `/static/reports/quantstats-results.html`.
+1. **Install Node.js dependencies**
+```bash
+cd frontend
+npm install
+```
+
+2. **Build React app for production** (optional)
+```bash
+npm run build
+```
+
+### Development
+
+#### Option 1: React Development (Recommended)
+```bash
+# Terminal 1: Start Flask backend
+python app.py
+
+# Terminal 2: Start React frontend  
+cd frontend && npm run dev
+```
+- Flask API: http://localhost:5001
+- React App: http://localhost:5173
+
+#### Option 2: Flask-only Development
+```bash
+python app.py
+```
+- Full app: http://localhost:5001
+
+### Production
+The React app builds to `/static/react-build/` and is automatically served by Flask when built.
 
 ## Data Loader Usage
 
@@ -128,7 +157,11 @@ docker run -p 5000:5000 -e PORT=5000 quantstatswebapp
 ### Environment Variables
 
 The container accepts the following environment variables:
-- `PORT`: Port to run the application on (default: 5000)
+- `PORT`: Port to run the application on (default: 5001)
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history and release notes.
 
 ## License
 MIT
