@@ -1,74 +1,220 @@
 <!-- templates/index.html -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quantstats Portfolio Analyzer</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <div class="qs-container">
-        <h1 class="qs-mb-4">Vietnam Stock Portfolio Analyzer</h1>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="qs-alert qs-alert-danger" role="alert">
-                {% for message in messages %}{{ message }}<br>{% endfor %}
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.2.1/dist/flowbite.min.js"></script>
+  </head>
+  <body class="bg-gray-50">
+    <div class="max-w-form mx-auto my-10 p-8 bg-white rounded-xl shadow-lg">
+      <h1 class="text-3xl font-bold text-primary-600 mb-6">
+        Vietnam Stock Portfolio Analyzer
+      </h1>
+
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <div
+        class="flex items-center p-4 mb-6 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50"
+        role="alert"
+      >
+        <svg
+          class="flex-shrink-0 inline w-4 h-4 me-3"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+          />
+        </svg>
+        <div>{% for message in messages %}{{ message }}<br />{% endfor %}</div>
+      </div>
+      {% endif %} {% endwith %}
+
+      <form action="/analyze" method="post" class="space-y-6">
+        <!-- Portfolio Composition Section -->
+        <div>
+          <label class="block mb-4 text-lg font-semibold text-gray-900"
+            >Portfolio Composition</label
+          >
+
+          <!-- Symbol/Weight Pairs -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label
+                for="symbol1"
+                class="block mb-2 text-sm font-medium text-gray-900"
+                >Symbol 1</label
+              >
+              <input
+                type="text"
+                id="symbol1"
+                name="symbols[]"
+                value="REE"
+                required
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+              />
             </div>
-        {% endif %}
-        {% endwith %}
-        <form action="/analyze" method="post">
-            <div class="mb-3">
-                <label class="qs-label">Portfolio Composition</label>
-                <div class="qs-row qs-mb-2">
-                    <div class="qs-col">
-                        <label for="symbol1" class="qs-label">Symbol 1</label>
-                        <input type="text" class="qs-input" id="symbol1" name="symbols[]" value="REE" required>
-                    </div>
-                    <div class="qs-col">
-                        <label for="weight1" class="qs-label">Weight</label>
-                        <input type="number" class="qs-input" id="weight1" name="weights[]" value="0.7" min="0" max="1" step="0.01" required>
-                    </div>
-                </div>
-                <div class="qs-row qs-mb-2">
-                    <div class="qs-col">
-                        <label for="symbol2" class="qs-label">Symbol 2</label>
-                        <input type="text" class="qs-input" id="symbol2" name="symbols[]" value="FMC" required>
-                    </div>
-                    <div class="qs-col">
-                        <label for="weight2" class="qs-label">Weight</label>
-                        <input type="number" class="qs-input" id="weight2" name="weights[]" value="0.2" min="0" max="1" step="0.01" required>
-                    </div>
-                </div>
-                <div class="qs-row qs-mb-2">
-                    <div class="qs-col">
-                        <label for="symbol3" class="qs-label">Symbol 3</label>
-                        <input type="text" class="qs-input" id="symbol3" name="symbols[]" value="DHC" required>
-                    </div>
-                    <div class="qs-col">
-                        <label for="weight3" class="qs-label">Weight</label>
-                        <input type="number" class="qs-input" id="weight3" name="weights[]" value="0.1" min="0" max="1" step="0.01" required>
-                    </div>
-                </div>
-                <div class="form-text">Weights must sum to 1.0</div>
+            <div>
+              <label
+                for="weight1"
+                class="block mb-2 text-sm font-medium text-gray-900"
+                >Weight</label
+              >
+              <input
+                type="number"
+                id="weight1"
+                name="weights[]"
+                value="0.7"
+                min="0"
+                max="1"
+                step="0.01"
+                required
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+              />
             </div>
-            <div class="mb-3 row">
-                <div class="qs-col">
-                    <label for="start_date" class="qs-label">Start Date</label>
-                    <input type="date" class="qs-input" id="start_date" name="start_date" value="2023-01-01" required>
-                </div>
-                <div class="qs-col">
-                    <label for="end_date" class="qs-label">End Date</label>
-                    <input type="date" class="qs-input" id="end_date" name="end_date" value="2025-04-15" required>
-                </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label
+                for="symbol2"
+                class="block mb-2 text-sm font-medium text-gray-900"
+                >Symbol 2</label
+              >
+              <input
+                type="text"
+                id="symbol2"
+                name="symbols[]"
+                value="FMC"
+                required
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+              />
             </div>
-            <div class="form-group">
-                <label for="capital">Initial Capital (VND)</label>
-                <input type="number" class="input-field" id="capital" name="capital" min="1000000" step="100000" value="500000000" required>
+            <div>
+              <label
+                for="weight2"
+                class="block mb-2 text-sm font-medium text-gray-900"
+                >Weight</label
+              >
+              <input
+                type="number"
+                id="weight2"
+                name="weights[]"
+                value="0.2"
+                min="0"
+                max="1"
+                step="0.01"
+                required
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+              />
             </div>
-            <button type="submit" class="button secondary">Analyze Portfolio</button>
-        </form>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label
+                for="symbol3"
+                class="block mb-2 text-sm font-medium text-gray-900"
+                >Symbol 3</label
+              >
+              <input
+                type="text"
+                id="symbol3"
+                name="symbols[]"
+                value="DHC"
+                required
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+              />
+            </div>
+            <div>
+              <label
+                for="weight3"
+                class="block mb-2 text-sm font-medium text-gray-900"
+                >Weight</label
+              >
+              <input
+                type="number"
+                id="weight3"
+                name="weights[]"
+                value="0.1"
+                min="0"
+                max="1"
+                step="0.01"
+                required
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+              />
+            </div>
+          </div>
+
+          <p class="text-sm text-gray-600 mb-4">Weights must sum to 1.0</p>
+        </div>
+
+        <!-- Date Range Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label
+              for="start_date"
+              class="block mb-2 text-sm font-medium text-gray-900"
+              >Start Date</label
+            >
+            <input
+              type="date"
+              id="start_date"
+              name="start_date"
+              value="2023-01-01"
+              required
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+            />
+          </div>
+          <div>
+            <label
+              for="end_date"
+              class="block mb-2 text-sm font-medium text-gray-900"
+              >End Date</label
+            >
+            <input
+              type="date"
+              id="end_date"
+              name="end_date"
+              value="2025-04-15"
+              required
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+            />
+          </div>
+        </div>
+
+        <!-- Capital Section -->
+        <div>
+          <label
+            for="capital"
+            class="block mb-2 text-sm font-medium text-gray-900"
+            >Initial Capital (VND)</label
+          >
+          <input
+            type="number"
+            id="capital"
+            name="capital"
+            min="1000000"
+            step="100000"
+            value="500000000"
+            required
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+          />
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+        >
+          Analyze Portfolio
+        </button>
+      </form>
     </div>
     <script src="/static/js/script.js"></script>
-</body>
+  </body>
 </html>

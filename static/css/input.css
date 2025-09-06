@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom components for QuantStats tearsheet compatibility */
+@layer components {
+  /* Preserve QuantStats container styling */
+  .qs-tearsheet-container {
+    max-width: 960px;
+    margin: 30px auto;
+  }
+  
+  /* Chart alignment utilities */
+  .qs-chart-margin {
+    margin: -1.5rem 0;
+  }
+  
+  /* Table styling to match QuantStats */
+  .qs-table td {
+    padding: 4px 5px 3px 5px;
+    text-align: right;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  
+  .qs-table th {
+    padding: 6px 5px 5px 5px;
+    text-align: right;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 400;
+  }
+  
+  .qs-table td:first-child,
+  .qs-table th:first-child {
+    text-align: left;
+    padding-left: 2px;
+  }
+  
+  .qs-table td:last-child,
+  .qs-table th:last-child {
+    text-align: right;
+    padding-right: 2px;
+  }
+}

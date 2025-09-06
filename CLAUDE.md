@@ -6,9 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Development
 - **Run locally**: `python app.py` (starts Flask dev server on port 5000)
-- **Run tests**: `pytest tests/test_app.py` (runs all tests)
-- **Run specific test**: `pytest tests/test_app.py::TestClassName::test_method_name`
+- **Run all tests**: `pytest` (runs all tests in tests/ directory)
+- **Run specific test file**: `pytest tests/test_app.py` or `pytest tests/test_data_loader.py`
+- **Run specific test**: `pytest tests/test_app.py::FlaskAppIntegrationTest::test_analyze_valid_redirects_to_html_report`
 - **Install dependencies**: `pip install -r requirements.txt` or `uv pip install --all --upgrade --refresh`
+- **Install frontend dependencies**: `npm install` (installs Tailwind CSS and Flowbite)
+- **Build CSS**: `npx tailwindcss -i ./static/css/input.css -o ./static/css/style.css --minify`
 - **Activate virtual environment**: `source .venv/bin/activate` (macOS/Linux) or `.venv\Scripts\activate` (Windows)
 
 ### Docker
@@ -46,9 +49,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **matplotlib**: Chart generation (backend set to 'Agg' for server-side rendering)
 
 ### Environment Requirements
-- Python >= 3.9
+- Python 3.10.11 (exact version specified in pyproject.toml)
 - SECRET_KEY environment variable required for Flask sessions
 - PORT environment variable for deployment (defaults to 5000)
+- Virtual environment strongly recommended
 
 ### Testing Strategy
 Tests verify routing behavior, HTML report generation, input validation, and matplotlib backend configuration. All tests use real vnstock API calls with valid Vietnam stock symbols like REE, FMC, DHC.
+
+### Important Notes
+- **Matplotlib backend**: Must be set to 'Agg' at the top of app.py for server-side rendering
+- **Vietnam stock symbols**: Use valid Vietnam stock tickers (REE, FMC, DHC, etc.) for testing
+- **Report output**: Generated HTML reports are saved to `static/reports/quantstats-results.html`
