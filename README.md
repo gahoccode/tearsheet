@@ -1,15 +1,16 @@
 # Tearsheet
 
-A Python web application for Vietnam stock portfolio analysis using Flask, vnstock, and quantstats.
+A modern Python web application for Vietnam stock portfolio analysis using Flask, vnstock, and QuantStats with a full-width responsive Bootstrap 5 interface.
 
-## Features
-- Fetches historical price data for user-selected Vietnam stock tickers using vnstock
-- Simulates portfolio performance and computes key metrics (returns, Sharpe, drawdown, etc.)
-- Generates interactive charts and downloadable QuantStats HTML tear sheet
-- Responsive custom CSS UI
-- **/analyze** route generates a QuantStats HTML report and redirects users to `/static/reports/quantstats-results.html` for a full tear sheet
-- "Back to Home" navigation is recommended for user-friendly return to the main page
-- Integrated tests verify routing, HTML file creation, and Matplotlib backend
+## ✨ Features
+- **Full-Width Responsive Design**: Modern Bootstrap 5 UI with flexible layout optimization
+- **Enhanced User Experience**: Side-by-side form layout with large controls and comprehensive validation
+- **Vietnam Stock Data**: Fetches historical price data using vnstock API for Vietnamese stocks
+- **Advanced Portfolio Analytics**: Comprehensive performance metrics, Sharpe ratio, drawdown analysis
+- **Interactive Tearsheet**: Direct HTML injection of QuantStats reports with full viewport utilization
+- **Mobile-First Design**: Responsive across all device sizes with adaptive scaling
+- **Real-time Validation**: Enhanced form validation with user-friendly feedback
+- **Professional Charts**: Performance summary, monthly returns heatmap, and drawdown analysis
 
 ## Project Structure
 - app.py: Flask backend (**implemented**)

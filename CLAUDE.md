@@ -4,16 +4,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Common Commands
 
-### Development
-- **Run locally**: `python app.py` (starts Flask dev server on port 5000)
-- **Run tests**: `pytest tests/test_app.py` (runs all tests)
-- **Run specific test**: `pytest tests/test_app.py::TestClassName::test_method_name`
-- **Install dependencies**: `pip install -r requirements.txt` or `uv pip install --all --upgrade --refresh`
+### Development with uv (Preferred)
+- **Install dependencies**: `uv sync` (installs all dependencies from pyproject.toml)
+- **Run locally**: `uv run python app.py` (starts Flask dev server on port 5000)
+- **Run tests**: `uv run pytest tests/` (runs all tests)
+- **Run specific test**: `uv run pytest tests/test_app.py::TestClassName::test_method_name`
+- **Code formatting**: `uv run ruff format` (formats code using Ruff)
+- **Linting**: `uv run ruff check` (checks code quality)
+- **Add dependencies**: `uv add package-name` (adds to pyproject.toml)
+
+### Development with pip (Alternative)
 - **Activate virtual environment**: `source .venv/bin/activate` (macOS/Linux) or `.venv\Scripts\activate` (Windows)
+- **Install dependencies**: `pip install -r requirements.txt`
+- **Run locally**: `python app.py`
+- **Run tests**: `pytest tests/`
 
 ### Docker
-- **Build**: `docker build -t quantstatswebapp .`
-- **Run container**: `docker run -p 5000:5000 -e PORT=5000 quantstatswebapp`
+- **Build**: `docker build -t tearsheet .`
+- **Run container**: `docker run -p 5000:5000 -e PORT=5000 tearsheet`
 - **Docker Compose**: `docker-compose up`
 
 ### Production
@@ -21,34 +29,46 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-### Core Components
-- **app.py**: Main Flask application with two routes:
-  - `GET /`: Renders portfolio input form
-  - `POST /analyze`: Processes portfolio data, generates QuantStats report, redirects to HTML tearsheet
-- **data_loader.py**: Data fetching module using vnstock API for Vietnam stock market data
-- **templates/**: HTML templates (Bootstrap UI)
-- **static/**: CSS, JS, and generated reports directory
-- **tests/**: Integration and unit tests
+### Core Application Structure
+- **app.py**: Main Flask application with two primary routes:
+  - `GET /`: Renders portfolio input form using Bootstrap UI
+  - `POST /analyze`: Validates input, fetches data, generates QuantStats tearsheet, redirects to HTML report
+- **data_loader.py**: Data fetching module with error handling, uses vnstock API for Vietnam stock market data
+- **templates/**: Jinja2 HTML templates with responsive Bootstrap UI
+- **static/**: CSS, JavaScript, and dynamically generated reports directory
+- **tests/**: Comprehensive unit and integration tests
+- **backend/**: Additional backend functionality (separate from main Flask app)
 
-### Data Flow
-1. User submits portfolio via web form (symbols, weights, dates, capital)
-2. Flask validates input and calls `fetch_historical_data()` from data_loader
-3. vnstock API fetches Vietnam stock data via `Quote.history()`
-4. Portfolio returns calculated using weighted sum of individual stock returns
-5. QuantStats generates interactive HTML report saved to `static/reports/quantstats-results.html`
-6. User redirected to view the complete tearsheet report
+### Data Processing Flow
+1. User submits portfolio form with symbols, weights, date range, and initial capital
+2. Flask validates all inputs (weights sum to 1.0, valid dates, positive capital)
+3. `fetch_historical_data()` calls vnstock's `Quote.history()` for each symbol
+4. Data merged on timestamps, close prices extracted for portfolio calculation
+5. Portfolio returns computed as weighted sum of individual stock returns
+6. QuantStats generates both embedded charts and full HTML tearsheet
+7. User redirected to `/static/reports/quantstats-results.html` for complete analysis
 
-### Key Dependencies
-- **Flask**: Web framework
-- **vnstock**: Vietnam stock market data API
-- **quantstats**: Portfolio analytics and tearsheet generation
-- **pandas**: Data manipulation
-- **matplotlib**: Chart generation (backend set to 'Agg' for server-side rendering)
+### Key Dependencies and Configuration
+- **Flask**: Web framework with secret key validation
+- **vnstock**: Vietnam stock market API (primary data source)
+- **quantstats**: Portfolio analytics, tearsheet generation, and performance metrics
+- **pandas**: Time series data manipulation and merging
+- **matplotlib**: Chart generation (configured with 'Agg' backend for server-side rendering)
+- **tenacity**: Retry logic for API calls
+- **gunicorn**: Production WSGI server
 
-### Environment Requirements
-- Python >= 3.9
-- SECRET_KEY environment variable required for Flask sessions
-- PORT environment variable for deployment (defaults to 5000)
+### Environment and Deployment
+- **Python**: Requires >= 3.10 (specified in pyproject.toml)
+- **SECRET_KEY**: Environment variable required for Flask sessions
+- **PORT**: Environment variable for deployment (defaults to 5000)
+- **uv**: Modern Python package manager with concurrent builds and caching
+- **GitHub Container Registry**: Automated Docker image builds on push to main/master
 
-### Testing Strategy
-Tests verify routing behavior, HTML report generation, input validation, and matplotlib backend configuration. All tests use real vnstock API calls with valid Vietnam stock symbols like REE, FMC, DHC.
+### Error Handling Strategy
+- Custom `DataLoaderError` exception for data fetching issues
+- Comprehensive input validation with user-friendly flash messages
+- Graceful handling of vnstock API failures with specific error messages
+- Matplotlib backend configuration prevents GUI-related server errors
+
+### Testing Approach
+Tests verify complete request/response cycles, HTML report generation, input edge cases, and matplotlib backend configuration. Uses real vnstock API with valid Vietnamese stock symbols (REE, FMC, DHC) to ensure integration reliability.

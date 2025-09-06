@@ -1,74 +1,206 @@
-<!-- templates/index.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantstats Portfolio Analyzer</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <div class="qs-container">
-        <h1 class="qs-mb-4">Vietnam Stock Portfolio Analyzer</h1>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="qs-alert qs-alert-danger" role="alert">
-                {% for message in messages %}{{ message }}<br>{% endfor %}
+{% extends "base.html" %}
+
+{% block title %}Portfolio Analyzer - Tearsheet{% endblock %}
+
+{% block container_class %}container-fluid px-3{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-lg border-0 mx-auto" style="max-width: none;">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title mb-0">
+                    <i class="bi bi-graph-up-arrow me-2"></i>
+                    Portfolio Analysis
+                </h2>
+                <p class="card-subtitle mb-0 opacity-75">Analyze your Vietnam stock portfolio with QuantStats</p>
             </div>
-        {% endif %}
-        {% endwith %}
-        <form action="/analyze" method="post">
-            <div class="mb-3">
-                <label class="qs-label">Portfolio Composition</label>
-                <div class="qs-row qs-mb-2">
-                    <div class="qs-col">
-                        <label for="symbol1" class="qs-label">Symbol 1</label>
-                        <input type="text" class="qs-input" id="symbol1" name="symbols[]" value="REE" required>
+            <div class="card-body p-4">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        {% for message in messages %}{{ message }}<br>{% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
-                    <div class="qs-col">
-                        <label for="weight1" class="qs-label">Weight</label>
-                        <input type="number" class="qs-input" id="weight1" name="weights[]" value="0.7" min="0" max="1" step="0.01" required>
+                {% endif %}
+                {% endwith %}
+
+                <form action="/analyze" method="post" class="needs-validation" novalidate>
+                    <div class="row g-4">
+                        <!-- Portfolio Composition Section -->
+                        <div class="col-lg-8">
+                            <div class="mb-4">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-pie-chart me-2"></i>
+                                    Portfolio Composition
+                                </h5>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-sm-6">
+                                        <label for="symbol1" class="form-label fw-semibold">Stock Symbol 1</label>
+                                        <input type="text" class="form-control form-control-lg" id="symbol1" name="symbols[]" value="REE" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid stock symbol.
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="weight1" class="form-label fw-semibold">Weight</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control form-control-lg" id="weight1" name="weights[]" value="0.7" min="0" max="1" step="0.01" required>
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Weight must be between 0 and 1.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-sm-6">
+                                        <label for="symbol2" class="form-label fw-semibold">Stock Symbol 2</label>
+                                        <input type="text" class="form-control form-control-lg" id="symbol2" name="symbols[]" value="FMC" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid stock symbol.
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="weight2" class="form-label fw-semibold">Weight</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control form-control-lg" id="weight2" name="weights[]" value="0.2" min="0" max="1" step="0.01" required>
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Weight must be between 0 and 1.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-sm-6">
+                                        <label for="symbol3" class="form-label fw-semibold">Stock Symbol 3</label>
+                                        <input type="text" class="form-control form-control-lg" id="symbol3" name="symbols[]" value="DHC" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid stock symbol.
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="weight3" class="form-label fw-semibold">Weight</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control form-control-lg" id="weight3" name="weights[]" value="0.1" min="0" max="1" step="0.01" required>
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Weight must be between 0 and 1.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info d-flex align-items-center">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    <div>Portfolio weights must sum to 1.0 (100%)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Analysis Parameters Section -->
+                        <div class="col-lg-4">
+                            <div class="mb-4">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-calendar-range me-2"></i>
+                                    Analysis Period
+                                </h5>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-12">
+                                        <label for="start_date" class="form-label fw-semibold">Start Date</label>
+                                        <input type="date" class="form-control form-control-lg" id="start_date" name="start_date" value="2023-01-01" required>
+                                        <div class="invalid-feedback">
+                                            Please select a start date.
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="end_date" class="form-label fw-semibold">End Date</label>
+                                        <input type="date" class="form-control form-control-lg" id="end_date" name="end_date" value="2024-12-31" required>
+                                        <div class="invalid-feedback">
+                                            Please select an end date.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-currency-dollar me-2"></i>
+                                    Investment Details
+                                </h5>
+                                <div class="col-12">
+                                    <label for="capital" class="form-label fw-semibold">Initial Capital (VND)</label>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text">₫</span>
+                                        <input type="number" class="form-control" id="capital" name="capital" min="1000000" step="100000" value="500000000" required>
+                                        <div class="invalid-feedback">
+                                            Initial capital must be at least 1,000,000 VND.
+                                        </div>
+                                    </div>
+                                    <div class="form-text">
+                                        Minimum investment: ₫1,000,000 (1 million VND)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="qs-row qs-mb-2">
-                    <div class="qs-col">
-                        <label for="symbol2" class="qs-label">Symbol 2</label>
-                        <input type="text" class="qs-input" id="symbol2" name="symbols[]" value="FMC" required>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#helpModal">
+                            <i class="bi bi-question-circle me-2"></i>
+                            Help
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-lg px-4">
+                            <i class="bi bi-graph-up me-2"></i>
+                            Analyze Portfolio
+                            <span class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+                        </button>
                     </div>
-                    <div class="qs-col">
-                        <label for="weight2" class="qs-label">Weight</label>
-                        <input type="number" class="qs-input" id="weight2" name="weights[]" value="0.2" min="0" max="1" step="0.01" required>
-                    </div>
-                </div>
-                <div class="qs-row qs-mb-2">
-                    <div class="qs-col">
-                        <label for="symbol3" class="qs-label">Symbol 3</label>
-                        <input type="text" class="qs-input" id="symbol3" name="symbols[]" value="DHC" required>
-                    </div>
-                    <div class="qs-col">
-                        <label for="weight3" class="qs-label">Weight</label>
-                        <input type="number" class="qs-input" id="weight3" name="weights[]" value="0.1" min="0" max="1" step="0.01" required>
-                    </div>
-                </div>
-                <div class="form-text">Weights must sum to 1.0</div>
+                </form>
             </div>
-            <div class="mb-3 row">
-                <div class="qs-col">
-                    <label for="start_date" class="qs-label">Start Date</label>
-                    <input type="date" class="qs-input" id="start_date" name="start_date" value="2023-01-01" required>
-                </div>
-                <div class="qs-col">
-                    <label for="end_date" class="qs-label">End Date</label>
-                    <input type="date" class="qs-input" id="end_date" name="end_date" value="2025-04-15" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="capital">Initial Capital (VND)</label>
-                <input type="number" class="input-field" id="capital" name="capital" min="1000000" step="100000" value="500000000" required>
-            </div>
-            <button type="submit" class="button secondary">Analyze Portfolio</button>
-        </form>
+        </div>
     </div>
-    <script src="/static/js/script.js"></script>
-</body>
-</html>
+</div>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-question-circle me-2"></i>
+                    How to Use
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Stock Symbols</h6>
+                <p>Enter Vietnam stock symbols (e.g., REE, FMC, DHC). These should be valid symbols traded on Ho Chi Minh Stock Exchange (HOSE) or Hanoi Stock Exchange (HNX).</p>
+                
+                <h6>Portfolio Weights</h6>
+                <p>Assign weights to each stock representing their proportion in your portfolio. Weights must be between 0 and 1, and must sum to exactly 1.0 (representing 100% of your portfolio).</p>
+                
+                <h6>Date Range</h6>
+                <p>Select the period for historical analysis. The system will fetch historical price data for this period to calculate portfolio performance.</p>
+                
+                <h6>Initial Capital</h6>
+                <p>Enter your initial investment amount in Vietnamese Dong (VND). This will be used to calculate absolute returns and position sizes.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Show help modal on page load for first-time users
+    if (!localStorage.getItem('tearsheet_help_shown')) {
+        setTimeout(() => {
+            const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
+            helpModal.show();
+            localStorage.setItem('tearsheet_help_shown', 'true');
+        }, 1000);
+    }
+</script>
+{% endblock %}

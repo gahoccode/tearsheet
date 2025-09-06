@@ -4,7 +4,7 @@ Flask backend for QuantstatsWebApp.
 Implements '/' and '/analyze' routes per PRD.
 """
 
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from data_loader import fetch_historical_data, get_close_prices, DataLoaderError
 import pandas as pd
 import os
@@ -136,14 +136,97 @@ def analyze():
         except Exception as report_ex:
             flash(f'Failed to generate QuantStats HTML report: {report_ex}')
             return render_template('index.html'), 200
-        # Redirect to the generated HTML report
-        return redirect(url_for('static', filename='reports/quantstats-results.html'))
+        # Store analysis metadata in session (not the large image data)
+        session['analysis_results'] = {
+            'symbols': symbols,
+            'weights': weights_float,
+            'start_date': start_date,
+            'end_date': end_date,
+            'capital': capital_float,
+            'timestamp': str(pd.Timestamp.now())
+        }
+        
+        # Save images to temporary files
+        import tempfile
+        import json
+        temp_dir = os.path.join('static', 'temp')
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        temp_data = {
+            'summary_img': summary_img_base64,
+            'monthly_img': monthly_img_base64,
+            'drawdown_img': drawdown_img_base64
+        }
+        
+        # Create a unique filename based on session
+        import hashlib
+        session_id = hashlib.md5(str(session.get('analysis_results', {})).encode()).hexdigest()[:10]
+        temp_file = os.path.join(temp_dir, f'analysis_{session_id}.json')
+        
+        with open(temp_file, 'w') as f:
+            json.dump(temp_data, f)
+        
+        session['temp_file'] = f'analysis_{session_id}.json'
+        return redirect(url_for('results'))
     except DataLoaderError as e:
         flash(f"Error fetching data: {str(e)}")
         return render_template('index.html'), 200
     except Exception as ex:
         flash(f'Unexpected error: {ex}')
         return render_template('index.html'), 200
+
+@app.route('/results', methods=['GET'])
+def results():
+    try:
+        # Get results from session
+        analysis_results = session.get('analysis_results')
+        temp_file_name = session.get('temp_file')
+        
+        if not analysis_results or not temp_file_name:
+            flash('No analysis results found. Please run a new analysis.')
+            return redirect(url_for('index'))
+        
+        # Load image data from temporary file
+        import json
+        temp_file_path = os.path.join('static', 'temp', temp_file_name)
+        summary_img = ''
+        monthly_img = ''
+        drawdown_img = ''
+        
+        if os.path.exists(temp_file_path):
+            with open(temp_file_path, 'r') as f:
+                temp_data = json.load(f)
+                summary_img = temp_data.get('summary_img', '')
+                monthly_img = temp_data.get('monthly_img', '')
+                drawdown_img = temp_data.get('drawdown_img', '')
+        
+        # Extract metadata from session
+        symbols = analysis_results.get('symbols', [])
+        weights = analysis_results.get('weights', [])
+        start_date = analysis_results.get('start_date', '')
+        end_date = analysis_results.get('end_date', '')
+        capital = analysis_results.get('capital', 0)
+        
+        # Read the QuantStats HTML file content directly
+        html_report_path = os.path.join('static', 'reports', 'quantstats-results.html')
+        quantstats_html_content = ""
+        if os.path.exists(html_report_path):
+            with open(html_report_path, 'r', encoding='utf-8') as f:
+                quantstats_html_content = f.read()
+        
+        return render_template('results.html',
+                             summary_img=summary_img,
+                             monthly_img=monthly_img,
+                             drawdown_img=drawdown_img,
+                             symbols=symbols,
+                             weights=weights,
+                             start_date=start_date,
+                             end_date=end_date,
+                             capital=capital,
+                             quantstats_html_content=quantstats_html_content)
+    except Exception as e:
+        flash(f'Error displaying results: {e}')
+        return redirect(url_for('index'))
 
 if __name__ == "__main__":
     import os
