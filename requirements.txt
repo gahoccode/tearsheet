@@ -1,6 +1,7 @@
 # Project dependencies for tearsheet
-# Note: This file is kept for backward compatibility
+# Note: This file is kept for Docker compatibility
 # Primary dependency management is now in pyproject.toml
+# Dependencies below are synced with pyproject.toml [project.dependencies]
 flask>=3.0.3
 vnstock>=3.2.6
 quantstats>=0.0.69

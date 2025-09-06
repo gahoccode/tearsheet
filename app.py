@@ -4,17 +4,27 @@ Flask backend for QuantstatsWebApp.
 Implements '/' and '/analyze' routes per PRD.
 """
 
-from flask import Flask, render_template, request, redirect, url_for, flash, session
-from data_loader import fetch_historical_data, get_close_prices, DataLoaderError
-import pandas as pd
-import os
-import io
 import base64
+import hashlib
+import io
+import json
+import os
+import re
+import uuid
 
 import matplotlib
-matplotlib.use('Agg')  # Use non-GUI backend for server-side image generation
-matplotlib.rcParams['font.family'] = 'DejaVu Sans'  # Use a Linux-safe font
+import matplotlib.pyplot as plt
+import pandas as pd
+import quantstats as qs
 from dotenv import load_dotenv
+from flask import Flask, flash, redirect, render_template, request, session, url_for
+
+from data_loader import DataLoaderError, fetch_historical_data, get_close_prices
+
+# Configure matplotlib for server-side rendering
+matplotlib.use('Agg')
+matplotlib.rcParams['font.family'] = 'DejaVu Sans'
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -54,7 +64,6 @@ def analyze():
             flash('Portfolio weights must sum to 1.0.')
             return render_template('index.html'), 200
         # Validate dates
-        import re
         date_pattern = r'^\d{4}-\d{2}-\d{2}$'
         if not re.match(date_pattern, start_date) or not re.match(date_pattern, end_date):
             flash('Date format must be YYYY-MM-DD.')
@@ -80,10 +89,7 @@ def analyze():
         returns = close_prices.pct_change().dropna()
         portfolio_returns = (returns * weights_float).sum(axis=1)
 
-        # Generate QuantStats static images (PNG/SVG) using quantstats.reports.full()
-        import quantstats as qs
-        import matplotlib.pyplot as plt
-        import uuid
+        # Generate QuantStats static images
         # Ensure static directory exists
         static_dir = os.path.join(os.path.dirname(__file__), 'static')
         os.makedirs(static_dir, exist_ok=True)
@@ -147,8 +153,6 @@ def analyze():
         }
         
         # Save images to temporary files
-        import tempfile
-        import json
         temp_dir = os.path.join('static', 'temp')
         os.makedirs(temp_dir, exist_ok=True)
         
@@ -159,7 +163,6 @@ def analyze():
         }
         
         # Create a unique filename based on session
-        import hashlib
         session_id = hashlib.md5(str(session.get('analysis_results', {})).encode()).hexdigest()[:10]
         temp_file = os.path.join(temp_dir, f'analysis_{session_id}.json')
         
@@ -187,7 +190,6 @@ def results():
             return redirect(url_for('index'))
         
         # Load image data from temporary file
-        import json
         temp_file_path = os.path.join('static', 'temp', temp_file_name)
         summary_img = ''
         monthly_img = ''

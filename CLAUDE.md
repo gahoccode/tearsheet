@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Development with pip (Alternative)
 - **Activate virtual environment**: `source .venv/bin/activate` (macOS/Linux) or `.venv\Scripts\activate` (Windows)
-- **Install dependencies**: `pip install -r requirements.txt`
+- **Install dependencies**: `pip install -r requirements.txt` (or `pip install -e .` for pyproject.toml)
 - **Run locally**: `python app.py`
 - **Run tests**: `pytest tests/`
 

@@ -103,9 +103,11 @@ Desktop.ini
 *.local
 *.env
 
-# Static reports
+# Static reports and temporary files
 *.png
 quantstats-results.html
+static/temp/
+static/reports/
 
 #windsurf
 .windsurfrules
