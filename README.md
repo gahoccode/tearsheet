@@ -1,4 +1,4 @@
-# QuantstatsWebApp
+# Tearsheet
 
 A modern web application for Vietnam stock portfolio analysis featuring a React frontend with Ant Design and Flask backend using vnstock and quantstats.
 
@@ -10,6 +10,8 @@ A modern web application for Vietnam stock portfolio analysis featuring a React 
 - **Responsive Design**: Mobile-first design with Ant Design's responsive grid system
 - **Form Validation**: Client-side and server-side validation for portfolio inputs
 - **Session Management**: Results stored in Flask sessions for seamless user experience
+- **Docker Support**: Containerization with GitHub Container Registry workflow
+- **Cloud Deployment**: Render.com deployment configuration
 
 ## Project Structure
 - **app.py**: Flask backend with JSON API and HTML template support

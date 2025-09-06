@@ -72,6 +72,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Report Output**: HTML reports saved to `/static/reports/quantstats-results.html`
 - **Testing**: pytest with real vnstock API calls for Vietnam stock symbols (REE, FMC, DHC)
 
-[Unreleased]: https://github.com/yourusername/tearsheet/compare/v2.0.0...HEAD
-[2.0.0]: https://github.com/yourusername/tearsheet/compare/v1.0.0...v2.0.0
-[1.0.0]: https://github.com/yourusername/tearsheet/releases/tag/v1.0.0
+### Changed (Historical)
+- Project renamed to "tearsheet"
+- UI framework from Bootstrap to custom CSS styling (later to React + Ant Design)
+- Matplotlib font to DejaVu Sans for Linux compatibility
+- Dependencies updated to latest versions
+
+### Fixed (Historical)
+- Server-side rendering issues with matplotlib backend set to 'Agg'
+- Cross-platform deployment compatibility
+
+## [1.0.0] - 2025-09-05
+### Added
+- **Flask Backend**: Core Flask application with portfolio analysis
+- **QuantStats Integration**: Portfolio analytics and tearsheet generation
+- **Vietnam Stock Data**: vnstock API integration for historical price data
+- **Portfolio Analysis**: Weighted return calculations and risk metrics
+- **HTML Templates**: Bootstrap-styled templates for portfolio input and results
+- **Static Chart Generation**: PNG chart generation with matplotlib
+- **Form Validation**: Server-side validation for portfolio inputs
+- **HTML Report Generation**: Full QuantStats HTML tearsheet reports
+- **Docker Support**: Containerization with GitHub Container Registry workflow
+- **Testing Suite**: Integration and unit tests for core functionality
+- **Environment Configuration**: .env file support for configuration
+- **Static File Serving**: CSS, JS, and generated reports
+- **Error Handling**: Comprehensive error handling and user feedback
+- **Claude Code Integration**: Configuration and documentation
+- **GitHub Container Registry (GHCR) workflow**: Automated Docker builds
+- **Render.com deployment**: Cloud deployment configuration
+
+### Technical Details
+- **Backend Stack**: Flask 3.0.3, QuantStats 0.0.69, vnstock 3.2.6, pandas 2.2.2
+- **Chart Generation**: matplotlib with 'Agg' backend for server-side rendering
+- **Data Processing**: Portfolio returns calculation with weighted sum approach
+- **Report Output**: HTML reports saved to `/static/reports/quantstats-results.html`
+- **Testing**: pytest with real vnstock API calls for Vietnam stock symbols (REE, FMC, DHC)
+
+[Unreleased]: https://github.com/gahoccode/tearsheet/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/gahoccode/tearsheet/compare/v1.0.0...v2.0.0
+[1.0.0]: https://github.com/gahoccode/tearsheet/releases/tag/v1.0.0
