@@ -1,6 +1,6 @@
 [project]
 name = "QuantstatsWebApp"
-version = "0.1.0"
+version = "1.0.0"
 description = "Vietnam stock portfolio analysis web app using Flask, vnstock, and quantstats."
 authors = ["Your Name <your@email.com>"]
 dependencies = [
