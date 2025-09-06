@@ -1,5 +1,5 @@
 [project]
-name = "QuantstatsWebApp"
+name = "tearsheet"
 version = "1.0.0"
 description = "Vietnam stock portfolio analysis web app using Flask, vnstock, and quantstats."
 authors = ["Your Name <your@email.com>"]

@@ -1,10 +1,10 @@
 version: '3.8'
 services:
-  quantstatswebapp:
+  tearsheet:
     build: .
-    container_name: quantstatswebapp
+    container_name: tearsheet
     ports:
-      - "5001:5000"
+      - "5001:5001"
     environment:
       #- SECRET_KEY=${SECRET_KEY}
       #- FLASK_ENV=${FLASK_ENV:-production}

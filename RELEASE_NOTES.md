@@ -2,7 +2,7 @@
 
 ## 🎉 Initial Release
 
-This is the first major release of QuantStats WebApp - a Vietnam stock portfolio analysis tool built with Flask, vnstock, and QuantStats.
+This is the first major release of Tearsheet - a Vietnam stock portfolio analysis tool built with Flask, vnstock, and QuantStats.
 
 ## ✨ Features
 

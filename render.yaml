@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: quantstats-webapp
+    name: tearsheet
     env: docker
     dockerfilePath: ./Dockerfile
     plan: free  # or starter/standard
