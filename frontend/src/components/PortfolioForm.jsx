@@ -79,10 +79,20 @@ function PortfolioForm() {
     }}>
       <div style={{ maxWidth: 700, margin: '0 auto' }}>
         <Card>
-          <Title level={1} style={{ textAlign: 'center', marginBottom: 32 }}>
-            <BarChartOutlined style={{ marginRight: 12 }} />
-            Vietnam Stock Portfolio Analyzer
-          </Title>
+          <Space direction="vertical" style={{ width: '100%', textAlign: 'center', marginBottom: 24 }}>
+            <Title level={1} style={{ margin: 0 }}>
+              <BarChartOutlined style={{ marginRight: 12 }} />
+              Vietnam Stock Portfolio Analyzer
+            </Title>
+            <Space>
+              <Button 
+                onClick={() => navigate('/ratio')}
+                style={{ marginLeft: 8 }}
+              >
+                Financial Ratios
+              </Button>
+            </Space>
+          </Space>
 
           <Form
             form={form}

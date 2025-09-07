@@ -17,6 +17,7 @@ export default defineConfig({
     proxy: {
       '/analyze': 'http://localhost:5001',
       '/results': 'http://localhost:5001',
+      '/ratio': 'http://localhost:5001',
       '/static': 'http://localhost:5001',
     }
   }

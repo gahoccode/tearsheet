@@ -6,7 +6,7 @@ Implements '/' and '/analyze' routes per PRD.
 
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_cors import CORS
-from data_loader import fetch_historical_data, get_close_prices, DataLoaderError
+from data_loader import fetch_historical_data, get_close_prices, fetch_financial_ratios, DataLoaderError
 import pandas as pd
 import os
 import io
@@ -197,6 +197,76 @@ def results():
                              start_date=analysis_results.get('start_date'),
                              end_date=analysis_results.get('end_date'),
                              capital=analysis_results.get('capital'))
+
+@app.route('/ratio', methods=['GET'])
+def ratio():
+    # Check if React build exists, serve it; otherwise fallback to Flask template
+    react_build_path = os.path.join(app.static_folder, 'react-build', 'index.html')
+    if os.path.exists(react_build_path):
+        return app.send_static_file('react-build/index.html')
+    else:
+        return render_template('ratio.html')
+
+@app.route('/ratio/analyze', methods=['POST'])
+def analyze_ratio():
+    try:
+        stock_symbol = request.form.get('stock_symbol', '').strip().upper()
+        period = request.form.get('period', 'year').strip()
+        
+        # Validate stock symbol
+        if not stock_symbol:
+            error_msg = 'Stock symbol is required.'
+            # Check if request wants JSON (from React)
+            if request.headers.get('Accept') == 'application/json':
+                return jsonify({'error': error_msg}), 400
+            else:
+                flash(error_msg)
+                return render_template('ratio.html'), 400
+                
+        # Validate period
+        if period not in ['year', 'quarter']:
+            period = 'year'  # Default to year if invalid
+            
+        # Fetch financial ratios (already flattened by data_loader)
+        ratio_data = fetch_financial_ratios(stock_symbol, period=period, lang='en')
+        
+        # Convert DataFrame to dict for JSON serialization
+        ratio_dict = ratio_data.to_dict('records')
+        
+        # Prepare results
+        ratio_results = {
+            'stock_symbol': stock_symbol,
+            'period': period,
+            'ratio_data': ratio_dict,
+            'columns': list(ratio_data.columns),
+            'success': True
+        }
+        
+        # Store in session for potential template use
+        session['ratio_results'] = ratio_results
+        
+        # Check if request wants JSON (from React)
+        if request.headers.get('Accept') == 'application/json':
+            return jsonify(ratio_results)
+        else:
+            return render_template('ratio_results.html', results=ratio_results)
+            
+    except DataLoaderError as e:
+        error_msg = str(e)
+        # Check if request wants JSON (from React)
+        if request.headers.get('Accept') == 'application/json':
+            return jsonify({'error': error_msg, 'success': False}), 400
+        else:
+            flash(error_msg)
+            return render_template('ratio.html'), 400
+    except Exception as e:
+        error_msg = f'An unexpected error occurred: {str(e)}'
+        # Check if request wants JSON (from React)
+        if request.headers.get('Accept') == 'application/json':
+            return jsonify({'error': error_msg, 'success': False}), 500
+        else:
+            flash(error_msg)
+            return render_template('ratio.html'), 500
 
 # Catch-all route for React Router (client-side routing)
 @app.route('/<path:path>')

@@ -6,7 +6,8 @@ Follows modular, testable, and robust design per project standards.
 
 from typing import List, Dict
 import pandas as pd
-from vnstock import Quote
+from vnstock import Quote, Vnstock
+from vnstock.core.utils.transform import flatten_hierarchical_index
 import logging
 
 class DataLoaderError(Exception):
@@ -78,3 +79,42 @@ def get_close_prices(combined_data: pd.DataFrame, symbols: List[str]) -> pd.Data
     if missing_cols:
         raise DataLoaderError(f"Missing columns in combined data: {missing_cols}")
     return combined_data[close_cols].copy()
+
+def fetch_financial_ratios(stock_symbol: str, period: str = 'year', lang: str = 'en') -> pd.DataFrame:
+    """
+    Fetch financial ratios for a stock symbol using vnstock.
+    
+    Args:
+        stock_symbol (str): Stock ticker symbol (e.g., 'REE', 'VIC').
+        period (str): Period type ('year', 'quarter'). Default 'year'.
+        lang (str): Language for column names ('en', 'vi'). Default 'en'.
+    
+    Returns:
+        pd.DataFrame: DataFrame containing financial ratios with flattened column names.
+        
+    Raises:
+        DataLoaderError: If no ratio data could be fetched.
+        
+    Example:
+        >>> fetch_financial_ratios('REE', period='year', lang='en')
+    """
+    try:
+        stock = Vnstock().stock(symbol=stock_symbol, source='VCI')
+        ratio_data = stock.finance.ratio(period=period, lang=lang, dropna=True)
+        
+        if ratio_data.empty:
+            raise DataLoaderError(f"No financial ratio data available for symbol {stock_symbol}")
+        
+        # Flatten hierarchical column index using vnstock utility
+        flattened_df = flatten_hierarchical_index(
+            ratio_data,  # multi-index df
+            separator="_",  # separator for flattened columns
+            handle_duplicates=True,  # handle duplicate column names
+            drop_levels=0,  # or specify levels to drop
+        )
+        
+        return flattened_df
+        
+    except Exception as e:
+        logging.error(f"Error fetching financial ratios for {stock_symbol}: {e}")
+        raise DataLoaderError(f"Failed to fetch financial ratios for {stock_symbol}: {str(e)}")

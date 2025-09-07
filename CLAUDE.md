@@ -6,28 +6,47 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Development
 
-#### Traditional Flask Development
-- **Run Flask backend only**: `python app.py` (starts Flask dev server on port 5001, serves HTML templates)
+#### Python Environment Setup
+- **Create virtual environment**: `python -m venv venv`
+- **Activate virtual environment**: `source venv/bin/activate` (macOS/Linux) or `venv\Scripts\activate` (Windows)
 - **Install Python dependencies**: `uv pip install --all --upgrade --refresh`
-- **Activate virtual environment**: `source .venv/bin/activate` (macOS/Linux) or `.venv\Scripts\activate` (Windows)
+- **Install dev dependencies**: `uv pip install --group dev`
 
-#### React + Flask Development
+#### Running the Application
+
+##### React + Flask Development (Recommended)
 - **Run Flask backend**: `python app.py` (starts Flask API server on port 5001)
 - **Run React frontend**: `cd frontend && npm run dev` (starts Vite dev server on port 5173)
 - **Install React dependencies**: `cd frontend && npm install`
 - **Build React for production**: `cd frontend && npm run build` (builds to `/static/react-build/`)
 
-#### Testing
-- **Run tests**: `pytest tests/test_app.py` (runs all tests)
+##### Flask-only Development
+- **Run Flask backend only**: `python app.py` (starts Flask dev server on port 5001, serves HTML templates)
+
+#### Code Quality and Testing
+- **Run all tests**: `pytest` or `pytest tests/`
 - **Run specific test**: `pytest tests/test_app.py::TestClassName::test_method_name`
+- **Test coverage**: `pytest --cov=. tests/`
+- **Lint Python code**: `ruff check .`
+- **Format Python code**: `black .` and `isort .`
+- **Lint React code**: `cd frontend && npm run lint`
+- **Type checking**: `mypy .`
 
 ### Docker
 - **Build**: `docker build -t quantstatswebapp .`
-- **Run container**: `docker run -p 5000:5000 -e PORT=5000 quantstatswebapp`
+- **Run container**: `docker run -p 5001:5001 -e PORT=5001 quantstatswebapp`
 - **Docker Compose**: `docker-compose up`
 
 ### Production
-- **Gunicorn**: `gunicorn app:app --bind 0.0.0.0:${PORT:-5000} --timeout 120`
+- **Gunicorn**: `gunicorn app:app --bind 0.0.0.0:${PORT:-5001} --timeout 120`
+
+### Package Management
+- **Root package.json scripts**:
+  - `npm run dev:frontend`: Start React dev server
+  - `npm run dev:backend`: Start Flask backend
+  - `npm run build`: Build React for production
+  - `npm run changelog`: Generate changelog from commits
+  - `npm run changelog:all`: Generate full changelog
 
 ## Architecture
 
@@ -76,9 +95,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **dayjs**: Date manipulation library
 
 ### Environment Requirements
-- Python >= 3.9
+- Python >= 3.10 (as specified in pyproject.toml)
 - SECRET_KEY environment variable required for Flask sessions
 - PORT environment variable for deployment (defaults to 5001)
+- Node.js for React frontend development
 
 ### Testing Strategy
 Tests verify routing behavior, HTML report generation, input validation, and matplotlib backend configuration. All tests use real vnstock API calls with valid Vietnam stock symbols like REE, FMC, DHC.
